@@ -24,13 +24,20 @@ public class HelloApplication extends Application {
 
         mainLayout = new BorderPane();
 
-        // 1. Add Logo to the Top
+        // 1. Get Logo
         ImageView logo = getLogoView();
-        mainLayout.setTop(logo);
-        BorderPane.setAlignment(logo, Pos.CENTER);
-        BorderPane.setMargin(logo, new Insets(20, 0, 10, 0));
+        // 2. Create Slogan Label
+        Label slogan = new Label("not just clothes , it's a store you could rely on");
+        slogan.setStyle("-fx-font-style: italic; -fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: bold;");
 
-        // 2. Show Login Screen in the Center first
+        // 3. Group Logo and Slogan in a VBox
+        javafx.scene.layout.VBox topContainer = new javafx.scene.layout.VBox(5); // 5 is spacing between logo and text
+        topContainer.getChildren().addAll(logo, slogan);
+        topContainer.setAlignment(Pos.CENTER);
+        topContainer.setPadding(new Insets(15, 0, 15, 0));
+
+        // 4. Set the VBox as the Top of the layout
+        mainLayout.setTop(topContainer);
         mainLayout.setCenter(createLoginPane());
 
         // 3. Setup Scene and CSS
@@ -41,7 +48,7 @@ public class HelloApplication extends Application {
             System.out.println("CSS file not found");
         }
 
-        stage.setTitle("Authentication Screen");
+        stage.setTitle("Mickey Store");
         stage.setScene(scene);
         stage.show();
     }
@@ -65,10 +72,11 @@ public class HelloApplication extends Application {
 
         // Sign In Button Action
         Button signInBtn = new Button("Sign In");
+
         signInBtn.setOnAction(e -> {
-            // Check username and password
+            // هنا المفروض تتأكد من الداتابيز (حالياً هنسيبها static زي ما هي للتجربة)
             if (nameField.getText().equals("mickey") && passField.getText().equals("123")) {
-                showAlert(Alert.AlertType.INFORMATION, "Signed In", "Hello Mickey!");
+                mainLayout.setCenter(createCategoriesPane());
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Wrong username or password");
             }
@@ -171,6 +179,72 @@ public class HelloApplication extends Application {
 
         return signupRoot;
     }
+
+    // --- Create Categories Home Screen ---
+    private GridPane createCategoriesPane() {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(20);
+        grid.setVgap(20);
+        grid.setPadding(new Insets(20));
+
+        Label welcomeLabel = new Label("Choose a Category:");
+        welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        // 1. Gents Button
+        Button gentsBtn = new Button("Gents");
+        gentsBtn.setPrefSize(100, 50);
+        gentsBtn.setOnAction(e -> mainLayout.setCenter(createProductScene("Gents")));
+
+        // 2. Ladies Button
+        Button ladiesBtn = new Button("Ladies");
+        ladiesBtn.setPrefSize(100, 50);
+        ladiesBtn.setOnAction(e -> mainLayout.setCenter(createProductScene("Ladies")));
+
+        // 3. Kids Button
+        Button kidsBtn = new Button("Kids");
+        kidsBtn.setPrefSize(100, 50);
+        kidsBtn.setOnAction(e -> mainLayout.setCenter(createProductScene("Kids")));
+
+        // logout
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.setStyle("-fx-background-color: #702963;");
+        logoutBtn.setOnAction(e -> mainLayout.setCenter(createLoginPane()));
+
+
+        grid.add(welcomeLabel, 0, 0, 3, 1);
+        grid.add(gentsBtn, 0, 1);
+        grid.add(ladiesBtn, 1, 1);
+        grid.add(kidsBtn, 2, 1);
+        grid.add(logoutBtn, 1, 3);
+
+        return grid;
+    }
+
+    // --- Create Generic Product Screen ---
+    private GridPane createProductScene(String categoryName) {
+        GridPane prodGrid = new GridPane();
+        prodGrid.setAlignment(Pos.CENTER);
+        prodGrid.setVgap(20);
+
+        // scene title
+        Label titleLabel = new Label(categoryName + " Section");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #333;");
+
+        Label infoLabel = new Label("List of " + categoryName + " products will appear here...");
+
+        // back to categories
+        Button backBtn = new Button("Back to Categories");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+
+        prodGrid.add(titleLabel, 0, 0);
+        prodGrid.add(infoLabel, 0, 1);
+        prodGrid.add(backBtn, 0, 2);
+
+        return prodGrid;
+    }
+
+
 
     // --- Helper: Load Image ---
     private ImageView getLogoView() {
