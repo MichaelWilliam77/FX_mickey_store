@@ -1,0 +1,38 @@
+/* Main Background Color (Light Blue) */
+.root {
+    -fx-background-color: #a9d6ff;
+}
+
+/* Text Settings: Font & Dark Blue Color */
+.label, .radio-button, .check-box {
+    -fx-font-family: 'Segoe UI', 'Arial', sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #102a43;
+}
+
+/* Button Style: Blue, Rounded, Shadow */
+.button {
+    -fx-background-color: #00509d;
+    -fx-text-fill: white;
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 3);
+}
+
+/* Mouse Hover Effect: Brighter & Bigger */
+.button:hover {
+    -fx-background-color: #0062cc;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Click Effect: Darker & No Shadow */
+.button:pressed {
+    -fx-background-color: #003c75;
+    -fx-effect: none;
+}
