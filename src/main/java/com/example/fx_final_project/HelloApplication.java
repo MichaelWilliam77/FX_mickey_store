@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import javafx.scene.layout.VBox;
 
 public class HelloApplication extends Application {
 
@@ -194,7 +195,7 @@ public class HelloApplication extends Application {
         // 1. Gents Button
         Button gentsBtn = new Button("Gents");
         gentsBtn.setPrefSize(100, 50);
-        gentsBtn.setOnAction(e -> mainLayout.setCenter(createProductScene("Gents")));
+        gentsBtn.setOnAction(e -> mainLayout.setCenter(GentsSection()));
 
         // 2. Ladies Button
         Button ladiesBtn = new Button("Ladies");
@@ -267,6 +268,209 @@ public class HelloApplication extends Application {
         alert.setContentText(content);
         alert.showAndWait();
     }
+    private ScrollPane GentsSection() {
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setHgap(30);
+        grid.setVgap(45);
+        grid.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Gents Section");
+        title.getStyleClass().add("section-title");
+        grid.add(title, 0, 0, 3, 1);
+
+        // ============ PRODUCT 1 ============
+        VBox card1 = new VBox(10);
+        VBox card2 = new VBox(10);
+        VBox card3 = new VBox(10);
+        VBox card4 = new VBox(10);
+        VBox card5 = new VBox(10);
+        VBox card6 = new VBox(10);
+
+
+
+        //***********************************************************
+        card1.setAlignment(Pos.CENTER);
+        card1.getStyleClass().add("product-card");
+
+        card2.setAlignment(Pos.CENTER);
+        card2.getStyleClass().add("product-card");
+
+        card3.setAlignment(Pos.CENTER);
+        card3.getStyleClass().add("product-card");
+
+        card4.setAlignment(Pos.CENTER);
+        card4.getStyleClass().add("product-card");
+
+        card5.setAlignment(Pos.CENTER);
+        card5.getStyleClass().add("product-card");
+
+        card6.setAlignment(Pos.CENTER);
+        card6.getStyleClass().add("product-card");
+        //***********************************************************
+
+        ImageView img1 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/shirt.jpg")));
+        img1.setFitWidth(120);
+        img1.setPreserveRatio(true);
+
+        Label name1 = new Label("Casual Shirt");
+        name1.getStyleClass().add("product-name");
+
+        Label price1 = new Label("$25");
+        price1.getStyleClass().add("product-price");
+        ComboBox<String> sizeBox1 = new ComboBox<>();
+        sizeBox1.getItems().addAll("S", "M", "L", "XL", "XXL");
+        sizeBox1.setPromptText("Choose Size");
+        sizeBox1.getStyleClass().add("size-box");
+
+        Button add1 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card1.getChildren().addAll(img1, name1, price1,sizeBox1 , add1);
+
+        // ============ PRODUCT 2 ============
+
+
+        ImageView img2 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/jeans.jpg")));
+        img2.setFitWidth(120);
+        img2.setPreserveRatio(true);
+
+        Label name2 = new Label("Jeans Pants");
+        name2.getStyleClass().add("product-name");
+
+        Label price2 = new Label("$40");
+        price2.getStyleClass().add("product-price");
+
+        ComboBox<String> sizeBox2 = new ComboBox<>();
+        sizeBox2.getItems().addAll("S", "M", "L", "XL", "XXL");
+        sizeBox2.setPromptText("Choose Size");
+        sizeBox2.getStyleClass().add("size-box");
+
+        Button add2 = new Button("Add to Cart");
+        add2.getStyleClass().add("primary-btn");
+        add2.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Jeans Pants added to cart!"));
+
+        card2.getChildren().addAll(img2, name2, price2,sizeBox2 , add2);
+
+        // ============ PRODUCT 3 ============
+
+
+        ImageView img3 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/hoodie.jpg")));
+        img3.setFitWidth(120);
+        img3.setPreserveRatio(true);
+
+        Label name3 = new Label("Hoodie");
+        name3.getStyleClass().add("product-name");
+
+        Label price3 = new Label("$35");
+        price3.getStyleClass().add("product-price");
+
+        ComboBox<String> sizeBox3 = new ComboBox<>();
+        sizeBox3.getItems().addAll("S", "M", "L", "XL", "XXL");
+        sizeBox3.setPromptText("Choose Size");
+        sizeBox3.getStyleClass().add("size-box");
+
+        Button add3 = new Button("Add to Cart");
+        add3.getStyleClass().add("primary-btn");
+        add3.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Hoodie added to cart!"));
+
+        card3.getChildren().addAll(img3, name3, price3,sizeBox3 , add3);
+
+        //  ******************* product 3 **************************
+
+        ImageView img4 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/sport.jpg")));
+        img4.setFitWidth(120);
+        img4.setPreserveRatio(true);
+
+        Label name4 = new Label("Sport clothe");
+        name1.getStyleClass().add("product-name");
+
+        Label price4 = new Label("$20");
+        price1.getStyleClass().add("product-price");
+
+        ComboBox<String> sizeBox4 = new ComboBox<>();
+        sizeBox4.getItems().addAll("S", "M", "L", "XL", "XXL");
+        sizeBox4.setPromptText("Choose Size");
+        sizeBox4.getStyleClass().add("size-box");
+
+        Button add4 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card4.getChildren().addAll(img4, name4, price4,sizeBox4 , add4);
+
+        //<><><>><><><><><>><><><><> P5<><><><><><><><><><><><><><><><><><><><><><
+
+        ImageView img5 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/jacket.jpg")));
+        img5.setFitWidth(120);
+        img5.setPreserveRatio(true);
+
+        Label name5 = new Label("jacket");
+        name1.getStyleClass().add("product-name");
+
+        Label price5 = new Label("$20");
+        price1.getStyleClass().add("product-price");
+
+        ComboBox<String> sizeBox5 = new ComboBox<>();
+        sizeBox5.getItems().addAll("S", "M", "L", "XL", "XXL");
+        sizeBox5.setPromptText("Choose Size");
+        sizeBox5.getStyleClass().add("size-box");
+
+        Button add5 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card5.getChildren().addAll(img5, name5, price5,sizeBox5 , add5);
+
+//<><><><><><><><><<><><><><><>P6><><><><><><><><><><><><><><
+
+        ImageView img6 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/formal.jpg")));
+        img6.setFitWidth(120);
+        img6.setPreserveRatio(true);
+
+        Label name6 = new Label("sneaker");
+        name1.getStyleClass().add("product-name");
+
+        Label price6 = new Label("$35");
+        price1.getStyleClass().add("product-price");
+
+        ComboBox<String> sizeBox6 = new ComboBox<>();
+        sizeBox6.getItems().addAll("S", "M", "L", "XL", "XXL");
+        sizeBox6.setPromptText("Choose Size");
+        sizeBox6.getStyleClass().add("size-box");
+
+
+        Button add6 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card6.getChildren().addAll(img6, name6, price6,sizeBox6 , add6);
+
+//><><><><><><><><><><><><><><><><><><><<><><><><><><><><><><><><><><><><><><
+        //  Grid
+        grid.add(card1, 0, 1);
+        grid.add(card2, 1, 1);
+        grid.add(card3, 2, 1);
+        grid.add(card4, 0, 2);
+        grid.add(card5, 1, 2);
+        grid.add(card6, 2, 2);
+
+
+
+        // Back Button
+        Button backBtn = new Button("Back");
+        backBtn.getStyleClass().add("back-btn");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+        grid.add(backBtn, 1, 3);
+
+        ScrollPane scroll = new ScrollPane(grid);
+        scroll.setFitToWidth(true);
+
+        return scroll;
+    }
+
 
     public static void main(String[] args) {
         launch();
