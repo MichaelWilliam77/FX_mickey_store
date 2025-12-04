@@ -10,6 +10,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -199,7 +200,9 @@ public class HelloApplication extends Application {
         // 2. Ladies Button
         Button ladiesBtn = new Button("Ladies");
         ladiesBtn.setPrefSize(100, 50);
-        ladiesBtn.setOnAction(e -> mainLayout.setCenter(createProductScene("Ladies")));
+        ladiesBtn.setOnAction(e -> {
+            mainLayout.setCenter(getView()); // calls your Ladies StorePage
+        });
 
         // 3. Kids Button
         Button kidsBtn = new Button("Kids");
@@ -266,6 +269,100 @@ public class HelloApplication extends Application {
         alert.setTitle(title);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    //ladies section
+    public BorderPane getView() {
+
+        BorderPane root = new BorderPane();
+
+
+        //header
+        VBox header = new VBox();
+        header.getStyleClass().add("header");
+
+
+        //logo
+        ImageView logo = new ImageView(loadImage("/mickey_store.jpg"));
+        logo.setFitWidth(120);
+        logo.setPreserveRatio(true);
+
+
+        //content
+        VBox content = new VBox();
+        content.setAlignment(Pos.TOP_CENTER);
+        content.setSpacing(30);
+        content.setPadding(new Insets(30));
+
+
+
+        //title
+        Label title = new Label("Ladies Section");
+        title.getStyleClass().add("title");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(30);
+        grid.setAlignment(Pos.CENTER);
+
+        // Cards
+        grid.add(createCard("Casual jacket", 25, "/ladie1.jpeg"), 0, 0);
+        grid.add(createCard("Jeans Pants", 40, "/ladie2.jpeg"), 1, 0);
+        grid.add(createCard("coot", 35, "/ladie4.jpeg"), 2, 0);
+
+        grid.add(createCard("red Jacket", 50, "/ladie4.jpeg"), 0, 1);
+        grid.add(createCard("grey jacket", 60, "/ladie5.jpeg"), 1, 1);
+        grid.add(createCard("Denim Jacket", 45, "/ladie6.jpeg"), 2, 1);
+
+        content.getChildren().addAll(title, grid);
+
+        // علشان يبقي بيسكرول
+        ScrollPane scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        scrollPane.setStyle("-fx-background-color:transparent;");
+
+        root.setTop(header);
+        root.setCenter(scrollPane);
+
+
+        root.getStylesheets().add(getClass().getResource("/mina.css").toExternalForm());
+
+        return root;
+    }
+
+    // card
+    private VBox createCard(String name, double price, String imagePath) {
+        VBox card = new VBox();
+        card.getStyleClass().add("card");
+
+        ImageView imageView = new ImageView(loadImage(imagePath));
+        imageView.setFitWidth(200);
+        imageView.fitHeightProperty();
+        imageView.setPreserveRatio(true);
+
+        Label productName = new Label(name);
+        productName.getStyleClass().add("product-name");
+
+        Label productPrice = new Label("$" + price);
+        productPrice.getStyleClass().add("product-price");
+
+        Button btn = new Button("Add to Cart");
+        btn.getStyleClass().add("add-to-cart-btn");
+
+        card.getChildren().addAll(imageView, productName, productPrice, btn);
+
+        return card;
+    }
+
+    // علشان الصوره لو مجتش او فيها error
+    private Image loadImage(String path) {
+        try {
+            return new Image(getClass().getResource(path).toExternalForm());
+        } catch (Exception e) {
+            System.err.println("Image not found: " + path);
+            return new Image("https://via.placeholder.com/150");
+        }
     }
 
     public static void main(String[] args) {
