@@ -322,16 +322,12 @@ public class HelloApplication extends Application {
 
         Label price1 = new Label("$25");
         price1.getStyleClass().add("product-price");
-        ComboBox<String> sizeBox1 = new ComboBox<>();
-        sizeBox1.getItems().addAll("S", "M", "L", "XL", "XXL");
-        sizeBox1.setPromptText("Choose Size");
-        sizeBox1.getStyleClass().add("size-box");
 
         Button add1 = new Button("Add to Cart");
         add1.getStyleClass().add("primary-btn");
         add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
 
-        card1.getChildren().addAll(img1, name1, price1,sizeBox1 , add1);
+        card1.getChildren().addAll(img1, name1, price1 , add1);
 
         // ============ PRODUCT 2 ============
 
@@ -346,16 +342,13 @@ public class HelloApplication extends Application {
         Label price2 = new Label("$40");
         price2.getStyleClass().add("product-price");
 
-        ComboBox<String> sizeBox2 = new ComboBox<>();
-        sizeBox2.getItems().addAll("S", "M", "L", "XL", "XXL");
-        sizeBox2.setPromptText("Choose Size");
-        sizeBox2.getStyleClass().add("size-box");
+
 
         Button add2 = new Button("Add to Cart");
         add2.getStyleClass().add("primary-btn");
         add2.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Jeans Pants added to cart!"));
 
-        card2.getChildren().addAll(img2, name2, price2,sizeBox2 , add2);
+        card2.getChildren().addAll(img2, name2, price2, add2);
 
         // ============ PRODUCT 3 ============
 
@@ -370,16 +363,13 @@ public class HelloApplication extends Application {
         Label price3 = new Label("$35");
         price3.getStyleClass().add("product-price");
 
-        ComboBox<String> sizeBox3 = new ComboBox<>();
-        sizeBox3.getItems().addAll("S", "M", "L", "XL", "XXL");
-        sizeBox3.setPromptText("Choose Size");
-        sizeBox3.getStyleClass().add("size-box");
+
 
         Button add3 = new Button("Add to Cart");
         add3.getStyleClass().add("primary-btn");
         add3.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Hoodie added to cart!"));
 
-        card3.getChildren().addAll(img3, name3, price3,sizeBox3 , add3);
+        card3.getChildren().addAll(img3, name3, price3, add3);
 
         //  ******************* product 3 **************************
 
@@ -393,16 +383,12 @@ public class HelloApplication extends Application {
         Label price4 = new Label("$20");
         price1.getStyleClass().add("product-price");
 
-        ComboBox<String> sizeBox4 = new ComboBox<>();
-        sizeBox4.getItems().addAll("S", "M", "L", "XL", "XXL");
-        sizeBox4.setPromptText("Choose Size");
-        sizeBox4.getStyleClass().add("size-box");
 
         Button add4 = new Button("Add to Cart");
         add1.getStyleClass().add("primary-btn");
         add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
 
-        card4.getChildren().addAll(img4, name4, price4,sizeBox4 , add4);
+        card4.getChildren().addAll(img4, name4, price4,  add4);
 
         //<><><>><><><><><>><><><><> P5<><><><><><><><><><><><><><><><><><><><><><
 
@@ -416,16 +402,12 @@ public class HelloApplication extends Application {
         Label price5 = new Label("$20");
         price1.getStyleClass().add("product-price");
 
-        ComboBox<String> sizeBox5 = new ComboBox<>();
-        sizeBox5.getItems().addAll("S", "M", "L", "XL", "XXL");
-        sizeBox5.setPromptText("Choose Size");
-        sizeBox5.getStyleClass().add("size-box");
 
         Button add5 = new Button("Add to Cart");
         add1.getStyleClass().add("primary-btn");
         add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
 
-        card5.getChildren().addAll(img5, name5, price5,sizeBox5 , add5);
+        card5.getChildren().addAll(img5, name5, price5, add5);
 
 //<><><><><><><><><<><><><><><>P6><><><><><><><><><><><><><><
 
@@ -439,17 +421,14 @@ public class HelloApplication extends Application {
         Label price6 = new Label("$35");
         price1.getStyleClass().add("product-price");
 
-        ComboBox<String> sizeBox6 = new ComboBox<>();
-        sizeBox6.getItems().addAll("S", "M", "L", "XL", "XXL");
-        sizeBox6.setPromptText("Choose Size");
-        sizeBox6.getStyleClass().add("size-box");
+
 
 
         Button add6 = new Button("Add to Cart");
         add1.getStyleClass().add("primary-btn");
         add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
 
-        card6.getChildren().addAll(img6, name6, price6,sizeBox6 , add6);
+        card6.getChildren().addAll(img6, name6, price6,  add6);
 
 //><><><><><><><><><><><><><><><><><><><<><><><><><><><><><><><><><><><><><><
         //  Grid
