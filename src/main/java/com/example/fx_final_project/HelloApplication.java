@@ -208,7 +208,7 @@ public class HelloApplication extends Application {
         // 3. Kids Button
         Button kidsBtn = new Button("Kids");
         kidsBtn.setPrefSize(100, 50);
-        kidsBtn.setOnAction(e -> mainLayout.setCenter(createProductScene("Kids")));
+        kidsBtn.setOnAction(e -> mainLayout.setCenter(Kids()));
 
         // logout
         Button logoutBtn = new Button("Logout");
@@ -373,7 +373,7 @@ public class HelloApplication extends Application {
 
         //  ******************* product 3 **************************
 
-        ImageView img4 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/sport.jpg")));
+        ImageView img4 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/sportt.jpg")));
         img4.setFitWidth(120);
         img4.setPreserveRatio(true);
 
@@ -536,6 +536,187 @@ public class HelloApplication extends Application {
         card.getChildren().addAll(imageView, productName, productPrice, btn);
 
         return card;
+    }
+    private ScrollPane Kids() {
+
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setHgap(30);
+        grid.setVgap(45);
+        grid.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Gents Section");
+        title.getStyleClass().add("section-title");
+        grid.add(title, 0, 0, 3, 1);
+
+        // ============ PRODUCT 1 ============
+        VBox card1 = new VBox(10);
+        VBox card2 = new VBox(10);
+        VBox card3 = new VBox(10);
+        VBox card4 = new VBox(10);
+        VBox card5 = new VBox(10);
+        VBox card6 = new VBox(10);
+
+
+
+        //***********************************************************
+        card1.setAlignment(Pos.CENTER);
+        card1.getStyleClass().add("product-card");
+
+        card2.setAlignment(Pos.CENTER);
+        card2.getStyleClass().add("product-card");
+
+        card3.setAlignment(Pos.CENTER);
+        card3.getStyleClass().add("product-card");
+
+        card4.setAlignment(Pos.CENTER);
+        card4.getStyleClass().add("product-card");
+
+        card5.setAlignment(Pos.CENTER);
+        card5.getStyleClass().add("product-card");
+
+        card6.setAlignment(Pos.CENTER);
+        card6.getStyleClass().add("product-card");
+        //***********************************************************
+
+        ImageView img1 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/shirttt.jpeg")));
+        img1.setFitWidth(120);
+        img1.setPreserveRatio(true);
+
+        Label name1 = new Label(" kids shirt");
+        name1.getStyleClass().add("product-name");
+
+        Label price1 = new Label("$12");
+        price1.getStyleClass().add("product-price");
+
+        Button add1 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card1.getChildren().addAll(img1, name1, price1 , add1);
+
+        // ============ PRODUCT 2 ============
+
+
+        ImageView img2 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/skerts.jpg")));
+        img2.setFitWidth(120);
+        img2.setPreserveRatio(true);
+
+        Label name2 = new Label("Dress ");
+        name2.getStyleClass().add("product-name");
+
+        Label price2 = new Label("$20");
+        price2.getStyleClass().add("product-price");
+
+
+
+        Button add2 = new Button("Add to Cart");
+        add2.getStyleClass().add("primary-btn");
+        add2.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","dress added to cart!"));
+
+        card2.getChildren().addAll(img2, name2, price2, add2);
+
+        // ============ PRODUCT 3 ============
+
+
+        ImageView img3 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/baby.jpg")));
+        img3.setFitWidth(120);
+        img3.setPreserveRatio(true);
+
+        Label name3 = new Label("Baby Clothes");
+        name3.getStyleClass().add("product-name");
+
+        Label price3 = new Label("$13");
+        price3.getStyleClass().add("product-price");
+
+
+
+        Button add3 = new Button("Add to Cart");
+        add3.getStyleClass().add("primary-btn");
+        add3.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Baby Clothes added to cart!"));
+
+        card3.getChildren().addAll(img3, name3, price3, add3);
+
+        //  ******************* product 3 **************************
+
+        ImageView img4 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/sport2.jpg")));
+        img4.setFitWidth(120);
+        img4.setPreserveRatio(true);
+
+        Label name4 = new Label("Sport Clothes");
+        name1.getStyleClass().add("product-name");
+
+        Label price4 = new Label("$10");
+        price1.getStyleClass().add("product-price");
+
+
+        Button add4 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Sport Clothes added to cart!"));
+
+        card4.getChildren().addAll(img4, name4, price4,  add4);
+
+        //<><><>><><><><><>><><><><> P5<><><><><><><><><><><><><><><><><><><><><><
+
+        ImageView img5 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/kjacket.jpg")));
+        img5.setFitWidth(120);
+        img5.setPreserveRatio(true);
+
+        Label name5 = new Label("jacket");
+        name1.getStyleClass().add("product-name");
+
+        Label price5 = new Label("$15");
+        price1.getStyleClass().add("product-price");
+
+
+        Button add5 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card5.getChildren().addAll(img5, name5, price5, add5);
+
+//<><><><><><><><><<><><><><><>P6><><><><><><><><><><><><><><
+
+        ImageView img6 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/shoes.jpg")));
+        img6.setFitWidth(120);
+        img6.setPreserveRatio(true);
+
+        Label name6 = new Label("Shoes");
+        name1.getStyleClass().add("product-name");
+
+        Label price6 = new Label("$13");
+        price1.getStyleClass().add("product-price");
+
+
+
+
+        Button add6 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Shoes added to cart!"));
+
+        card6.getChildren().addAll(img6, name6, price6,  add6);
+
+//><><><><><><><><><><><><><><><><><><><<><><><><><><><><><><><><><><><><><><
+        //  Grid
+        grid.add(card1, 0, 1);
+        grid.add(card2, 1, 1);
+        grid.add(card3, 2, 1);
+        grid.add(card4, 0, 2);
+        grid.add(card5, 1, 2);
+        grid.add(card6, 2, 2);
+
+
+
+        // Back Button
+        Button backBtn = new Button("Back");
+        backBtn.getStyleClass().add("back-btn");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+        grid.add(backBtn, 1, 3);
+
+        ScrollPane scroll = new ScrollPane(grid);
+        scroll.setFitToWidth(true);
+
+        return scroll;
     }
 
     // علشان الصوره لو مجتش او فيها error
