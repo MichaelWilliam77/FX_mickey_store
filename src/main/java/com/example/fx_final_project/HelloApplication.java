@@ -545,7 +545,7 @@ public class HelloApplication extends Application {
         grid.setVgap(45);
         grid.setAlignment(Pos.CENTER);
 
-        Label title = new Label("Gents Section");
+        Label title = new Label("Kids Section");
         title.getStyleClass().add("section-title");
         grid.add(title, 0, 0, 3, 1);
 
