@@ -36,3 +36,51 @@
     -fx-background-color: #003c75;
     -fx-effect: none;
 }
+.product-card {
+    -fx-padding: 15;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #b4b4b4;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 4);
+
+}
+.section-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #123;
+}
+.product-card {
+    -fx-padding: 15;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #b4b4b4;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 4);
+}
+.product-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.product-price {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}
+.primary-btn {
+    -fx-background-color: #0A74DA;
+    -fx-text-fill: white;
+    -fx-background-radius: 7;
+}
+.primary-btn:hover {
+    -fx-background-color: #0859A8;
+    -fx-cursor: hand;
+}
+.back-btn {
+    -fx-background-color: #8e44ad;
+    -fx-text-fill: white;
+    -fx-background-radius: 7;
+}
+.back-btn:hover {
+    -fx-background-color: #6d3587;
+    -fx-cursor: hand;
+}
