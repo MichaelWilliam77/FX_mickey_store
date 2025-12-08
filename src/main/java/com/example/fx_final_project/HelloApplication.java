@@ -281,6 +281,8 @@ public class HelloApplication extends Application {
         VBox header = new VBox();
         header.getStyleClass().add("header");
 
+        Button backBtn = new Button("Back to Categories");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
 
         //logo
         ImageView logo = new ImageView(loadImage("/mickey_store.jpg"));
@@ -313,6 +315,7 @@ public class HelloApplication extends Application {
         grid.add(createCard("red Jacket", 50, "/ladie4.jpeg"), 0, 1);
         grid.add(createCard("grey jacket", 60, "/ladie5.jpeg"), 1, 1);
         grid.add(createCard("Denim Jacket", 45, "/ladie6.jpeg"), 2, 1);
+        grid.add(backBtn, 1, 2);
 
         content.getChildren().addAll(title, grid);
 
