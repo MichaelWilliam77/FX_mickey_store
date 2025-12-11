@@ -1,4 +1,9 @@
+.root {
+    -fx-font-family: 'Arial', sans-serif;
+    -fx-background-color: #f4f4f4;
+}
 
+/* تنسيق الهيدر */
 .header {
     -fx-background-color: #A7D5FF;
     -fx-alignment: center;
@@ -6,39 +11,68 @@
     -fx-padding: 15;
 }
 
-.subtitle {
-    -fx-font-size: 18px;
-    -fx-text-fill: darkslategray;//
-}
-
-.title {
+/* عنوان القسم (Gents, Ladies, etc) */
+.section-title {
     -fx-font-size: 28px;
-    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 20 0;
 }
 
-.card {
+/* تنسيق الكارت الموحد */
+.product-card {
     -fx-background-color: white;
     -fx-background-radius: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5); /* ظل خفيف */
     -fx-alignment: center;
     -fx-spacing: 10;
-    -fx-padding: 20;
-    -fx-pref-width: 100px;
+    -fx-padding: 15;
+    -fx-pref-width: 160px;
+    -fx-min-height: 220px;
+}
+
+/* تأثير لما الماوس يجي على الكارت */
+.product-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
 }
 
 .product-name {
-    -fx-font-size: 20px;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
 }
 
 .product-price {
-    -fx-font-size: 16px;
-    -fx-text-fill: gray;
+    -fx-font-size: 14px;
+    -fx-text-fill: #e67e22; /* لون برتقالي للسعر */
 }
 
-.add-to-cart-btn {
+/* زرار الشراء الموحد (Buy) */
+.primary-btn {
     -fx-background-color: #007bff;
     -fx-text-fill: white;
     -fx-font-size: 14px;
-    -fx-background-radius: 8;
-    -fx-pref-width: 300px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-pref-width: 120px;
+    -fx-cursor: hand;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #0056b3; /* لون أغمق عند اللمس */
+}
+
+.back-btn {
+    -fx-background-color: #6c757d; // لون رصاصى
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 20;
+    -fx-pref-width: 100px;
+    -fx-cursor: hand;
+}
+
+.back-btn:hover {
+    -fx-background-color: #545b62;
 }
