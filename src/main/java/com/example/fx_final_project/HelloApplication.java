@@ -116,7 +116,16 @@ public class HelloApplication extends Application {
         Label numberLabel = new Label("Phone:"); TextField numberField = new TextField();
         Label passLabel = new Label("Password:"); PasswordField passField = new PasswordField();
         Label repassLabel = new Label("Re-Password:"); PasswordField repassField = new PasswordField();
-        HBox genderBox = new HBox(15, new RadioButton("Male"), new RadioButton("Female"));
+        ToggleGroup genderGroup = new ToggleGroup();
+
+        RadioButton male   = new RadioButton("Male");
+        RadioButton female = new RadioButton("Female");
+
+        male.setToggleGroup(genderGroup);
+        female.setToggleGroup(genderGroup);
+
+        HBox genderBox = new HBox(15, male, female);
+
 
         Button registerBtn = new Button("Register");
         registerBtn.getStyleClass().add("primary-btn");
