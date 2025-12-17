@@ -7,53 +7,43 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
-import javafx.stage.Modality;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.io.IOException;
-import java.util.ArrayList;
+import javafx.scene.layout.VBox;
 
 public class HelloApplication extends Application {
 
-    // Main layout
+    // Main layout to hold Top (Logo) and Center (Login/Signup)
     private BorderPane mainLayout;
-
-    // Virtual Database (The Cart) - مخزن مؤقت للمشتريات
-    private final ArrayList<Order> myCart = new ArrayList<>();
-
-    // Inner Class to represent an Order
-    public static class Order {
-        String name;
-        String price;
-        String size;
-
-        public Order(String name, String price, String size) {
-            this.name = name;
-            this.price = price;
-            this.size = size;
-        }
-    }
 
     @Override
     public void start(Stage stage) throws IOException {
+
         mainLayout = new BorderPane();
 
-        // 1. Header (Logo + Slogan)
+        // 1. Get Logo
         ImageView logo = getLogoView();
-        Label slogan = new Label("not just clothes, it's a store you could rely on");
+        // 2. Create Slogan Label
+        Label slogan = new Label("not just clothes , it's a store you could rely on");
         slogan.setStyle("-fx-font-style: italic; -fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: bold;");
 
-        VBox topContainer = new VBox(5);
+        // 3. Group Logo and Slogan in a VBox
+        javafx.scene.layout.VBox topContainer = new javafx.scene.layout.VBox(5); // 5 is spacing between logo and text
         topContainer.getChildren().addAll(logo, slogan);
         topContainer.setAlignment(Pos.CENTER);
         topContainer.setPadding(new Insets(15, 0, 15, 0));
-        topContainer.getStyleClass().add("header");
 
+        // 4. Set the VBox as the Top of the layout
         mainLayout.setTop(topContainer);
         mainLayout.setCenter(createLoginPane());
 
-        // 2. Scene Setup
-        Scene scene = new Scene(mainLayout, 900, 700); // كبرنا الشاشة عشان تسع صفحة الدفع
+        // 3. Setup Scene and CSS
+        Scene scene = new Scene(mainLayout, 600, 450);
         try {
             scene.getStylesheets().add(getClass().getResource("mickey.css").toExternalForm());
         } catch (Exception e) {
@@ -65,10 +55,7 @@ public class HelloApplication extends Application {
         stage.show();
     }
 
-    // ============================================
-    // 1. LOGIN & SIGNUP SCREENS
-    // ============================================
-
+    // --- Create Login Screen ---
     private GridPane createLoginPane() {
         GridPane root = new GridPane();
         root.setAlignment(Pos.CENTER);
@@ -76,6 +63,7 @@ public class HelloApplication extends Application {
         root.setVgap(10);
         root.setPadding(new Insets(20));
 
+        // UI Controls
         Label nameLabel = new Label("Name");
         TextField nameField = new TextField();
         nameField.setPromptText("Enter your name");
@@ -84,9 +72,11 @@ public class HelloApplication extends Application {
         PasswordField passField = new PasswordField();
         passField.setPromptText("Enter your password");
 
+        // Sign In Button Action
         Button signInBtn = new Button("Sign In");
-        signInBtn.getStyleClass().add("primary-btn");
+
         signInBtn.setOnAction(e -> {
+            // هنا المفروض تتأكد من الداتابيز (حالياً هنسيبها static زي ما هي للتجربة)
             if (nameField.getText().equals("mickey") && passField.getText().equals("123")) {
                 mainLayout.setCenter(createCategoriesPane());
             } else {
@@ -94,17 +84,24 @@ public class HelloApplication extends Application {
             }
         });
 
+        // Switch to Signup Screen
         Button goToSignUpBtn = new Button("Sign Up");
-        goToSignUpBtn.getStyleClass().add("primary-btn");
-        goToSignUpBtn.setOnAction(e -> mainLayout.setCenter(createSignupPane()));
+        goToSignUpBtn.setOnAction(e -> {
+            mainLayout.setCenter(createSignupPane()); // Change Center View
+        });
 
-        root.add(nameLabel, 0, 0); root.add(nameField, 1, 0);
-        root.add(passLabel, 0, 1); root.add(passField, 1, 1);
-        root.add(signInBtn, 0, 2); root.add(goToSignUpBtn, 1, 2);
+        // Add items to Grid
+        root.add(nameLabel, 0, 0);
+        root.add(nameField, 1, 0);
+        root.add(passLabel, 0, 1);
+        root.add(passField, 1, 1);
+        root.add(signInBtn, 0, 2);
+        root.add(goToSignUpBtn, 1, 2);
 
         return root;
     }
 
+    // --- Create Signup Screen ---
     private GridPane createSignupPane() {
         GridPane signupRoot = new GridPane();
         signupRoot.setPadding(new Insets(20));
@@ -112,57 +109,78 @@ public class HelloApplication extends Application {
         signupRoot.setVgap(10);
         signupRoot.setHgap(10);
 
-        Label nameLabel = new Label("Name:"); TextField nameField = new TextField();
-        Label numberLabel = new Label("Phone:"); TextField numberField = new TextField();
-        Label passLabel = new Label("Password:"); PasswordField passField = new PasswordField();
-        Label repassLabel = new Label("Re-Password:"); PasswordField repassField = new PasswordField();
+        // UI Controls
+        Label nameLabel = new Label("Name:");
+        TextField nameField = new TextField();
+        nameField.setPromptText("Enter your name");Label numberLabel = new Label("Phone Number:");
+        TextField numberField = new TextField();
+        numberField.setPromptText("Enter your Phone Number");
+
+        Label passLabel = new Label("Password:");
+        PasswordField passField = new PasswordField();
+        passField.setPromptText("Enter your password");
+
+        Label repassLabel = new Label("Re-Password:");
+        PasswordField repassField = new PasswordField();
+        repassField.setPromptText("Enter your password again");
+
+        // Radio Buttons for Gender
+        RadioButton maleRb = new RadioButton("Male");
+        RadioButton femaleRb = new RadioButton("Female");
         ToggleGroup genderGroup = new ToggleGroup();
+        maleRb.setToggleGroup(genderGroup);
+        femaleRb.setToggleGroup(genderGroup);
+        maleRb.setSelected(true); // Default select
 
-        RadioButton male   = new RadioButton("Male");
-        RadioButton female = new RadioButton("Female");
+        HBox genderBox = new HBox(15, maleRb, femaleRb);
 
-        male.setToggleGroup(genderGroup);
-        female.setToggleGroup(genderGroup);
-
-        HBox genderBox = new HBox(15, male, female);
-
-
+        // Register Button Action
         Button registerBtn = new Button("Register");
-        registerBtn.getStyleClass().add("primary-btn");
         registerBtn.setOnAction(e -> {
-            if (nameField.getText().isEmpty() || passField.getText().isEmpty()) {
+            // 1. Check empty fields
+            if (nameField.getText().isEmpty()|| passField.getText().isEmpty() || numberField.getText().isEmpty()) {
                 showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill all fields");
                 return;
             }
+
+            // 2. Check password match
             if (passField.getText().equals(repassField.getText())) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Account created!");
-                mainLayout.setCenter(createLoginPane());
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Account created for " + nameField.getText());
+                mainLayout.setCenter(createLoginPane()); // Go back to Login
             } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Passwords do not match!");
+                showAlert(Alert.AlertType.ERROR, "Password Error", "Passwords do not match!");
             }
         });
 
+        // Back Button
         Button backBtn = new Button("Back to Login");
-        backBtn.getStyleClass().add("primary-btn");
-        backBtn.setOnAction(e -> mainLayout.setCenter(createLoginPane()));
+        backBtn.setOnAction(e -> {
+            mainLayout.setCenter(createLoginPane()); // Go back to Login
+        });
 
-        signupRoot.add(nameLabel, 0, 0); signupRoot.add(nameField, 1, 0);
-        signupRoot.add(numberLabel, 0, 1); signupRoot.add(numberField, 1, 1);
-        signupRoot.add(passLabel, 0, 2); signupRoot.add(passField, 1, 2);
-        signupRoot.add(repassLabel, 0, 3); signupRoot.add(repassField, 1, 3);
+        // Add items to Grid
+        signupRoot.add(nameLabel, 0, 0);
+        signupRoot.add(nameField, 1, 0);
+
+        signupRoot.add(numberLabel, 0, 1);
+        signupRoot.add(numberField, 1, 1);
+
+        signupRoot.add(passLabel, 0, 2);
+        signupRoot.add(passField, 1, 2);
+
+        signupRoot.add(repassLabel, 0, 3);
+        signupRoot.add(repassField, 1, 3);
+
         signupRoot.add(genderBox, 1, 4);
 
-        HBox btns = new HBox(10, registerBtn, backBtn);
-        btns.setAlignment(Pos.CENTER_RIGHT);
-        signupRoot.add(btns, 1, 5);
+        HBox buttonsBox = new HBox(10, registerBtn, backBtn);
+        buttonsBox.setAlignment(Pos.CENTER_RIGHT);
+        signupRoot.add(buttonsBox, 1, 5);
 
         return signupRoot;
     }
 
-    // ============================================
-    // 2. CATEGORIES (HOME) & CART
-    // ============================================
-
+    // --- Create Categories Home Screen ---
     private GridPane createCategoriesPane() {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -173,380 +191,531 @@ public class HelloApplication extends Application {
         Label welcomeLabel = new Label("Choose a Category:");
         welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        // 1. Gents Button
         Button gentsBtn = new Button("Gents");
-        gentsBtn.setPrefSize(120, 50);
+        gentsBtn.setPrefSize(100, 50);
         gentsBtn.setOnAction(e -> mainLayout.setCenter(GentsSection()));
 
+        // 2. Ladies Button
         Button ladiesBtn = new Button("Ladies");
-        ladiesBtn.setPrefSize(120, 50);
-        ladiesBtn.setOnAction(e -> mainLayout.setCenter(LadiesSection()));
-
-        Button kidsBtn = new Button("Kids");
-        kidsBtn.setPrefSize(120, 50);
-        kidsBtn.setOnAction(e -> mainLayout.setCenter(KidsSection()));
-
-        // --- تعديل حجم الزرار هنا لـ 200 عشان الكلام يظهر ---
-        Button cartBtn = new Button("My Cart (" + myCart.size() + ")");
-        cartBtn.setPrefSize(200, 50);
-        cartBtn.setStyle("-fx-background-color: #ff9f43; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
-        cartBtn.setOnAction(e -> mainLayout.setCenter(createCartScreen()));
-
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.setStyle("-fx-background-color: #702963; -fx-text-fill: white;");
-        logoutBtn.setOnAction(e -> {
-            myCart.clear();
-            mainLayout.setCenter(createLoginPane());
+        ladiesBtn.setPrefSize(100, 50);
+        ladiesBtn.setOnAction(e -> {
+            mainLayout.setCenter(getView());
         });
+
+        // 3. Kids Button
+        Button kidsBtn = new Button("Kids");
+        kidsBtn.setPrefSize(100, 50);
+        kidsBtn.setOnAction(e -> mainLayout.setCenter(Kids()));
+
+        // logout
+        Button logoutBtn = new Button("Logout");
+        logoutBtn.setStyle("-fx-background-color: #702963;");
+        logoutBtn.setOnAction(e -> mainLayout.setCenter(createLoginPane()));
+
 
         grid.add(welcomeLabel, 0, 0, 3, 1);
         grid.add(gentsBtn, 0, 1);
         grid.add(ladiesBtn, 1, 1);
         grid.add(kidsBtn, 2, 1);
-        grid.add(cartBtn, 0, 2, 3, 1);
-        grid.add(logoutBtn, 0, 4, 3, 1);
+        grid.add(logoutBtn, 1, 3);
 
         return grid;
+    }// --- Create Generic Product Screen ---
+    private GridPane createProductScene(String categoryName) {
+        GridPane prodGrid = new GridPane();
+        prodGrid.setAlignment(Pos.CENTER);
+        prodGrid.setVgap(20);
+
+        // scene title
+        Label titleLabel = new Label(categoryName + " Section");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #333;");
+
+        Label infoLabel = new Label("List of " + categoryName + " products will appear here...");
+
+        // back to categories
+        Button backBtn = new Button("Back to Categories");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+
+        prodGrid.add(titleLabel, 0, 0);
+        prodGrid.add(infoLabel, 0, 1);
+        prodGrid.add(backBtn, 0, 2);
+
+        return prodGrid;
     }
 
-    private ScrollPane createCartScreen() {
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(20));
 
-        Label title = new Label("My Shopping Cart");
-        title.getStyleClass().add("section-title");
-        grid.add(title, 0, 0);
 
-        if (myCart.isEmpty()) {
-            Label emptyLbl = new Label("Your cart is empty!");
-            emptyLbl.setStyle("-fx-font-size: 18px; -fx-text-fill: gray;");
-            grid.add(emptyLbl, 0, 1);
-
-            Button backBtn = new Button("Back to Categories");
-            backBtn.getStyleClass().add("primary-btn");
-            backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
-            grid.add(backBtn, 0, 2);
-        } else {
-            int row = 1;
-            for (Order order : myCart) {
-                HBox itemRow = new HBox(20);
-                itemRow.setAlignment(Pos.CENTER_LEFT);
-                itemRow.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 10; -fx-border-color: #ddd; -fx-border-radius: 10;");
-                itemRow.setPrefWidth(550); // وسعنا الصف شوية
-
-                Label nameLbl = new Label(order.name); nameLbl.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;"); nameLbl.setPrefWidth(120);
-                Label sizeLbl = new Label("Size: " + order.size); sizeLbl.setPrefWidth(100);
-                Label priceLbl = new Label(order.price); priceLbl.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
-
-                Button deleteBtn = new Button("Remove");
-                deleteBtn.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-size: 10px;");
-                deleteBtn.setOnAction(e -> {
-                    myCart.remove(order);
-                    mainLayout.setCenter(createCartScreen());
-                });
-
-                itemRow.getChildren().addAll(nameLbl, sizeLbl, priceLbl, new Region(), deleteBtn);
-                HBox.setHgrow(itemRow.getChildren().get(3), Priority.ALWAYS);
-                grid.add(itemRow, 0, row++);
-            }
-
-            // Buttons: Back & Proceed to Checkout
-            Button backBtn = new Button("Back Shopping");
-            backBtn.getStyleClass().add("primary-btn");
-            backBtn.setStyle("-fx-background-color: #95a5a6;");
-            backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
-
-            Button checkoutBtn = new Button("Proceed to Checkout ➔");
-            checkoutBtn.getStyleClass().add("primary-btn");
-            checkoutBtn.setStyle("-fx-background-color: #27ae60; -fx-font-size: 14px;");
-            checkoutBtn.setOnAction(e -> mainLayout.setCenter(createPaymentScreen()));
-
-            HBox actions = new HBox(15, backBtn, checkoutBtn);
-            actions.setAlignment(Pos.CENTER);
-            grid.add(actions, 0, row + 1);
+    // --- Helper: Load Image ---
+    private ImageView getLogoView() {
+        ImageView logoView = new ImageView();
+        try {
+            Image image = new Image(getClass().getResourceAsStream("mickey_store.jpg"));
+            logoView.setImage(image);
+            logoView.setFitWidth(150);
+            logoView.setPreserveRatio(true);
+        } catch (Exception e) {
+            System.out.println("Image not found");
         }
-
-        ScrollPane scroll = new ScrollPane(grid);
-        scroll.setFitToWidth(true);
-        return scroll;
+        return logoView;
     }
 
-    // ============================================
-    // 3. CHECKOUT / PAYMENT SCREEN (NEW)
-    // ============================================
-
-    private ScrollPane createPaymentScreen() {
-        VBox layout = new VBox(20);
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.setPadding(new Insets(30));
-        layout.setStyle("-fx-background-color: #f4f4f4;");
-
-        // Title & Total
-        Label title = new Label("Checkout");
-        title.getStyleClass().add("section-title");
-
-        double totalAmount = calculateTotal();
-        Label totalLbl = new Label("Total to Pay: $" + totalAmount);
-        totalLbl.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
-
-        // Shipping Address
-        VBox shippingBox = new VBox(10);
-        shippingBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-
-        Label shipTitle = new Label("📍 Shipping Address");
-        shipTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-        TextField addressField = new TextField(); addressField.setPromptText("Enter your full address");
-        TextField phoneField = new TextField(); phoneField.setPromptText("Contact Phone Number");
-        shippingBox.getChildren().addAll(shipTitle, addressField, phoneField);
-
-        // Payment Method
-        VBox paymentBox = new VBox(10);
-        paymentBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-
-        Label payTitle = new Label("💳 Payment Method");
-        payTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-
-        RadioButton cardRb = new RadioButton("Credit Card");
-        RadioButton cashRb = new RadioButton("Cash on Delivery");
-        ToggleGroup group = new ToggleGroup();
-        cardRb.setToggleGroup(group); cashRb.setToggleGroup(group);
-        cardRb.setSelected(true);
-
-        GridPane cardGrid = new GridPane();
-        cardGrid.setHgap(10); cardGrid.setVgap(10);
-        TextField cardNum = new TextField(); cardNum.setPromptText("0000 0000 0000 0000");
-        TextField cardName = new TextField(); cardName.setPromptText("Cardholder Name");
-        TextField cardExp = new TextField(); cardExp.setPromptText("MM/YY"); cardExp.setPrefWidth(80);
-        TextField cardCvv = new TextField(); cardCvv.setPromptText("CVV"); cardCvv.setPrefWidth(80);
-
-        cardGrid.add(new Label("Card Number:"), 0, 0); cardGrid.add(cardNum, 1, 0);
-        cardGrid.add(new Label("Holder Name:"), 0, 1); cardGrid.add(cardName, 1, 1);
-        HBox secInfo = new HBox(10, cardExp, cardCvv);
-        cardGrid.add(new Label("Exp/CVV:"), 0, 2); cardGrid.add(secInfo, 1, 2);
-
-        cashRb.setOnAction(e -> cardGrid.setDisable(true));
-        cardRb.setOnAction(e -> cardGrid.setDisable(false));
-
-        paymentBox.getChildren().addAll(payTitle, cardRb, cashRb, new Separator(), cardGrid);
-
-        // Actions
-// ... (باقي الكود زي ما هو لحد تعريف الزرار)
-
-        Button payBtn = new Button("Confirm Payment ($" + totalAmount + ")");
-        payBtn.getStyleClass().add("primary-btn");
-        payBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
-        payBtn.setPrefWidth(250);
-
-        payBtn.setOnAction(e -> {
-            // 1. التحقق من العنوان والتليفون (للكل)
-            if(addressField.getText().trim().isEmpty() || phoneField.getText().trim().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Missing Info", "Please enter your shipping address and phone.");
-                return; // وقف الكود هنا
-            }
-
-            // 2. التحقق من بيانات الفيزا (فقط لو مختار Credit Card)
-            if (cardRb.isSelected()) {
-                // التأكد إن رقم الكارت 16 رقم بالظبط (Regex)
-                if (!cardNum.getText().matches("\\d{16}")) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid Card", "Card number must be 16 digits (Numbers only).");
-                    return;
-                }
-
-                // التأكد إن الـ CVV مكون من 3 أرقام
-                if (!cardCvv.getText().matches("\\d{3}")) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid CVV", "CVV must be 3 digits.");
-                    return;
-                }
-
-                // التأكد إن التاريخ مش فاضي
-                if (cardExp.getText().isEmpty()) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid Date", "Please enter expiry date.");
-                    return;
-                }
-            }
-
-            // 3. لو عدى من كل الشروط اللي فوق، تم الدفع بنجاح
-            showAlert(Alert.AlertType.INFORMATION, "Payment Successful",
-                    "Order Placed Successfully!\nShipping to: " + addressField.getText());
-
-            myCart.clear(); // فضي السلة
-            mainLayout.setCenter(createCategoriesPane()); // ارجع للصفحة الرئيسية
-        });
-
-        Button cancelBtn = new Button("Cancel");
-        cancelBtn.getStyleClass().add("primary-btn");
-        cancelBtn.setStyle("-fx-background-color: #e74c3c;");
-        cancelBtn.setOnAction(e -> mainLayout.setCenter(createCartScreen()));
-
-        HBox actions = new HBox(20, payBtn, cancelBtn);
-        actions.setAlignment(Pos.CENTER);
-
-        layout.getChildren().addAll(title, totalLbl, shippingBox, paymentBox, actions);
-        ScrollPane scroll = new ScrollPane(layout);
-        scroll.setFitToWidth(true);
-        return scroll;
+    // --- Helper: Show Alert ---
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
-
-    // ============================================
-    // 4. PRODUCT SECTIONS & HELPERS
-    // ============================================
-
     private ScrollPane GentsSection() {
-        return createSectionGrid("Gents Section", new String[][]{
-                {"Casual Shirt", "$25", "/com/example/fx_final_project/image/shirt.jpg"},
-                {"Jeans Pants", "$40", "/com/example/fx_final_project/image/jeans.jpg"},
-                {"Hoodie", "$35", "/com/example/fx_final_project/image/hoodie.jpg"},
-                {"Sport clothe", "$20", "/com/example/fx_final_project/image/sportt.jpg"},
-                {"Jacket", "$20", "/com/example/fx_final_project/image/jacket.jpg"},
-                {"Sneaker", "$35", "/com/example/fx_final_project/image/formal.jpg"}
-        });
-    }
 
-    private ScrollPane LadiesSection() {
-        return createSectionGrid("Ladies Section", new String[][]{
-                {"Casual jacket", "$25", "/ladie1.jpeg"},
-                {"Jeans Pants", "$40", "/ladie2.jpeg"},
-                {"Coat", "$35", "/ladie4.jpeg"},
-                {"Red Jacket", "$50", "/ladie4.jpeg"},
-                {"Grey jacket", "$60", "/ladie5.jpeg"},
-                {"Denim Jacket", "$45", "/ladie6.jpeg"}
-        });
-    }
-
-    private ScrollPane KidsSection() {
-        return createSectionGrid("Kids Section", new String[][]{
-                {"Kids Shirt", "$12", "/com/example/fx_final_project/image/shirttt.jpeg"},
-                {"Dress", "$20", "/com/example/fx_final_project/image/skerts.jpg"},
-                {"Baby Clothes", "$13", "/com/example/fx_final_project/image/baby.jpg"},
-                {"Sport Clothes", "$10", "/com/example/fx_final_project/image/sport2.jpg"},
-                {"Jacket", "$15", "/com/example/fx_final_project/image/kjacket.jpg"},
-                {"Shoes", "$13", "/com/example/fx_final_project/image/shoes.jpg"}
-        });
-    }
-
-    private ScrollPane createSectionGrid(String titleStr, String[][] productsData) {
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20));
         grid.setHgap(30);
         grid.setVgap(45);
         grid.setAlignment(Pos.CENTER);
 
-        Label title = new Label(titleStr);
+        Label title = new Label("Gents Section");
         title.getStyleClass().add("section-title");
         grid.add(title, 0, 0, 3, 1);
 
-        int col = 0;
-        int row = 1;
-        for (String[] prod : productsData) {
-            grid.add(createCard(prod[0], prod[1], prod[2]), col, row);
-            col++;
-            if (col == 3) {
-                col = 0;
-                row++;
-            }
-        }
+        // ============ PRODUCT 1 ============
+        VBox card1 = new VBox(10);
+        VBox card2 = new VBox(10);
+        VBox card3 = new VBox(10);
+        VBox card4 = new VBox(10);
+        VBox card5 = new VBox(10);
+        VBox card6 = new VBox(10);
 
+
+
+        //***********************************************************
+        card1.setAlignment(Pos.CENTER);
+        card1.getStyleClass().add("product-card");
+
+        card2.setAlignment(Pos.CENTER);
+        card2.getStyleClass().add("product-card");
+
+        card3.setAlignment(Pos.CENTER);
+        card3.getStyleClass().add("product-card");
+
+        card4.setAlignment(Pos.CENTER);
+        card4.getStyleClass().add("product-card");
+
+        card5.setAlignment(Pos.CENTER);
+        card5.getStyleClass().add("product-card");
+
+        card6.setAlignment(Pos.CENTER);
+        card6.getStyleClass().add("product-card");
+        //***********************************************************
+
+        ImageView img1 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/shirt.jpg")));
+        img1.setFitWidth(120);
+        img1.setPreserveRatio(true);
+
+        Label name1 = new Label("Casual Shirt");
+        name1.getStyleClass().add("product-name");
+
+        Label price1 = new Label("$25");
+        price1.getStyleClass().add("product-price");
+
+        Button add1 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card1.getChildren().addAll(img1, name1, price1 , add1);
+
+        // ============ PRODUCT 2 ============
+
+
+        ImageView img2 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/jeans.jpg")));
+        img2.setFitWidth(120);
+        img2.setPreserveRatio(true);
+
+        Label name2 = new Label("Jeans Pants");
+        name2.getStyleClass().add("product-name");
+
+        Label price2 = new Label("$40");
+        price2.getStyleClass().add("product-price");Button add2 = new Button("Add to Cart");
+        add2.getStyleClass().add("primary-btn");
+        add2.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Jeans Pants added to cart!"));
+
+        card2.getChildren().addAll(img2, name2, price2, add2);
+
+        // ============ PRODUCT 3 ============
+
+
+        ImageView img3 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/hoodie.jpg")));
+        img3.setFitWidth(120);
+        img3.setPreserveRatio(true);
+
+        Label name3 = new Label("Hoodie");
+        name3.getStyleClass().add("product-name");
+
+        Label price3 = new Label("$35");
+        price3.getStyleClass().add("product-price");
+
+
+
+        Button add3 = new Button("Add to Cart");
+        add3.getStyleClass().add("primary-btn");
+        add3.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Hoodie added to cart!"));
+
+        card3.getChildren().addAll(img3, name3, price3, add3);
+
+        //  ******************* product 3 **************************
+
+        ImageView img4 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/sportt.jpg")));
+        img4.setFitWidth(120);
+        img4.setPreserveRatio(true);
+
+        Label name4 = new Label("Sport clothe");
+        name1.getStyleClass().add("product-name");
+
+        Label price4 = new Label("$20");
+        price1.getStyleClass().add("product-price");
+
+
+        Button add4 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card4.getChildren().addAll(img4, name4, price4,  add4);
+
+        //<><><>><><><><><>><><><><> P5<><><><><><><><><><><><><><><><><><><><><><
+
+        ImageView img5 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/jacket.jpg")));
+        img5.setFitWidth(120);
+        img5.setPreserveRatio(true);
+
+        Label name5 = new Label("jacket");
+        name1.getStyleClass().add("product-name");
+
+        Label price5 = new Label("$20");
+        price1.getStyleClass().add("product-price");
+
+
+        Button add5 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card5.getChildren().addAll(img5, name5, price5, add5);
+
+//<><><><><><><><><<><><><><><>P6><><><><><><><><><><><><><><
+
+        ImageView img6 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/formal.jpg")));
+        img6.setFitWidth(120);
+        img6.setPreserveRatio(true);
+
+        Label name6 = new Label("sneaker");
+        name1.getStyleClass().add("product-name");
+
+        Label price6 = new Label("$35");
+        price1.getStyleClass().add("product-price");
+
+
+
+
+        Button add6 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card6.getChildren().addAll(img6, name6, price6,  add6);
+
+//><><><><><><><><><><><><><><><><><><><<><><><><><><><><><><><><><><><><><><
+        //  Grid
+        grid.add(card1, 0, 1);
+        grid.add(card2, 1, 1);
+        grid.add(card3, 2, 1);
+        grid.add(card4, 0, 2);
+        grid.add(card5, 1, 2);
+        grid.add(card6, 2, 2);
+
+
+
+        // Back Button
         Button backBtn = new Button("Back");
-        backBtn.getStyleClass().add("primary-btn");
-        backBtn.setStyle("-fx-background-color: #6c757d;");
+        backBtn.getStyleClass().add("back-btn");
         backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
-        grid.add(backBtn, 1, row + 1);
+        grid.add(backBtn, 1, 3);
 
         ScrollPane scroll = new ScrollPane(grid);
         scroll.setFitToWidth(true);
+
         return scroll;
     }
 
-    private VBox createCard(String name, String price, String imagePath) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        card.getStyleClass().add("product-card");
+
+    //ladies section
+    public BorderPane getView() {
+
+        BorderPane root = new BorderPane();
+
+
+        //header
+        VBox header = new VBox();
+        header.getStyleClass().add("header");Button backBtn = new Button("Back to Categories");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+
+        //logo
+        ImageView logo = new ImageView(loadImage("/mickey_store.jpg"));
+        logo.setFitWidth(120);
+        logo.setPreserveRatio(true);
+
+
+        //content
+        VBox content = new VBox();
+        content.setAlignment(Pos.TOP_CENTER);
+        content.setSpacing(30);
+        content.setPadding(new Insets(30));
+
+
+
+        //title
+        Label title = new Label("Ladies Section");
+        title.getStyleClass().add("title");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(30);
+        grid.setVgap(30);
+        grid.setAlignment(Pos.CENTER);
+
+        // Cards
+        grid.add(createCard("Casual jacket", 25, "/ladie1.jpeg"), 0, 0);
+        grid.add(createCard("Jeans Pants", 40, "/ladie2.jpeg"), 1, 0);
+        grid.add(createCard("coot", 35, "/ladie4.jpeg"), 2, 0);
+
+        grid.add(createCard("red Jacket", 50, "/ladie4.jpeg"), 0, 1);
+        grid.add(createCard("grey jacket", 60, "/ladie5.jpeg"), 1, 1);
+        grid.add(createCard("Denim Jacket", 45, "/ladie6.jpeg"), 2, 1);
+        grid.add(backBtn, 1, 2);
+
+        content.getChildren().addAll(title, grid);
+
+        // علشان يبقي بيسكرول
+        ScrollPane scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPannable(true);
+        scrollPane.setStyle("-fx-background-color:transparent;");
+
+        root.setTop(header);
+        root.setCenter(scrollPane);
+
+
+        root.getStylesheets().add(getClass().getResource("/mina.css").toExternalForm());
+
+        return root;
+    }
+
+    // card
+    private VBox createCard(String name, double price, String imagePath) {
+        VBox card = new VBox();
+        card.getStyleClass().add("card");
 
         ImageView imageView = new ImageView(loadImage(imagePath));
-        imageView.setFitWidth(120);
+        imageView.setFitWidth(200);
+        imageView.fitHeightProperty();
         imageView.setPreserveRatio(true);
 
         Label productName = new Label(name);
         productName.getStyleClass().add("product-name");
 
-        Label productPrice = new Label(price);
+        Label productPrice = new Label("$" + price);
         productPrice.getStyleClass().add("product-price");
 
-        Button btn = new Button("Buy");
-        btn.getStyleClass().add("primary-btn");
-        btn.setOnAction(e -> showProductDetails(name, price, imagePath));
+        Button btn = new Button("Add to Cart");
+        btn.getStyleClass().add("add-to-cart-btn");
 
         card.getChildren().addAll(imageView, productName, productPrice, btn);
+
         return card;
     }
+    private ScrollPane Kids() {
 
-    private void showProductDetails(String name, String price, String imagePath) {
-        Stage popupStage = new Stage();
-        popupStage.initModality(Modality.APPLICATION_MODAL);
-        popupStage.setTitle("Product Details");
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(20));
+        grid.setHgap(30);
+        grid.setVgap(45);
+        grid.setAlignment(Pos.CENTER);
 
-        VBox layout = new VBox(15);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-        layout.setStyle("-fx-background-color: white;");
+        Label title = new Label("Kids Section");
+        title.getStyleClass().add("section-title");
+        grid.add(title, 0, 0, 3, 1);
 
-        ImageView img = new ImageView(loadImage(imagePath));
-        img.setFitWidth(150); img.setPreserveRatio(true);
+        // ============ PRODUCT 1 ============
+        VBox card1 = new VBox(10);
+        VBox card2 = new VBox(10);
+        VBox card3 = new VBox(10);
+        VBox card4 = new VBox(10);
+        VBox card5 = new VBox(10);
+        VBox card6 = new VBox(10);
 
-        Label nameLbl = new Label(name); nameLbl.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-        Label priceLbl = new Label(price); priceLbl.setStyle("-fx-font-size: 18px; -fx-text-fill: green;");
-        Label sizeLbl = new Label("Select Size:");
-        ComboBox<String> sizeBox = new ComboBox<>();
-        sizeBox.getItems().addAll("Small", "Medium", "Large", "X-Large");
-        sizeBox.setValue("Medium");
 
-        Button confirmBtn = new Button("Confirm & Add to Cart");
-        confirmBtn.getStyleClass().add("primary-btn");
-        confirmBtn.setOnAction(e -> {
-            myCart.add(new Order(name, price, sizeBox.getValue()));
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Added to Cart!");
-            popupStage.close();
-        });
 
-        layout.getChildren().addAll(img, nameLbl, priceLbl, sizeLbl, sizeBox, confirmBtn);
-        Scene scene = new Scene(layout);
-        popupStage.setMinWidth(300);
-        try { scene.getStylesheets().add(getClass().getResource("mickey.css").toExternalForm()); }
-        catch (Exception ex) { /* ignore */ }
-        popupStage.setScene(scene);
-        popupStage.showAndWait();
+        //***********************************************************
+        card1.setAlignment(Pos.CENTER);
+        card1.getStyleClass().add("product-card");
+
+        card2.setAlignment(Pos.CENTER);
+        card2.getStyleClass().add("product-card");
+
+        card3.setAlignment(Pos.CENTER);
+        card3.getStyleClass().add("product-card");
+
+        card4.setAlignment(Pos.CENTER);
+        card4.getStyleClass().add("product-card");
+
+        card5.setAlignment(Pos.CENTER);
+        card5.getStyleClass().add("product-card");
+
+        card6.setAlignment(Pos.CENTER);
+        card6.getStyleClass().add("product-card");
+        //***********************************************************
+
+        ImageView img1 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/shirttt.jpeg")));
+        img1.setFitWidth(120);
+        img1.setPreserveRatio(true);
+
+        Label name1 = new Label(" kids shirt");
+        name1.getStyleClass().add("product-name");Label price1 = new Label("$12");
+        price1.getStyleClass().add("product-price");
+
+        Button add1 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card1.getChildren().addAll(img1, name1, price1 , add1);
+
+        // ============ PRODUCT 2 ============
+
+
+        ImageView img2 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/skerts.jpg")));
+        img2.setFitWidth(120);
+        img2.setPreserveRatio(true);
+
+        Label name2 = new Label("Dress ");
+        name2.getStyleClass().add("product-name");
+
+        Label price2 = new Label("$20");
+        price2.getStyleClass().add("product-price");
+
+
+
+        Button add2 = new Button("Add to Cart");
+        add2.getStyleClass().add("primary-btn");
+        add2.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","dress added to cart!"));
+
+        card2.getChildren().addAll(img2, name2, price2, add2);
+
+        // ============ PRODUCT 3 ============
+
+
+        ImageView img3 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/baby.jpg")));
+        img3.setFitWidth(120);
+        img3.setPreserveRatio(true);
+
+        Label name3 = new Label("Baby Clothes");
+        name3.getStyleClass().add("product-name");
+
+        Label price3 = new Label("$13");
+        price3.getStyleClass().add("product-price");
+
+
+
+        Button add3 = new Button("Add to Cart");
+        add3.getStyleClass().add("primary-btn");
+        add3.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Baby Clothes added to cart!"));
+
+        card3.getChildren().addAll(img3, name3, price3, add3);
+
+        //  ******************* product 3 **************************
+
+        ImageView img4 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/sport2.jpg")));
+        img4.setFitWidth(120);
+        img4.setPreserveRatio(true);
+
+        Label name4 = new Label("Sport Clothes");
+        name1.getStyleClass().add("product-name");
+
+        Label price4 = new Label("$10");
+        price1.getStyleClass().add("product-price");
+
+
+        Button add4 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Sport Clothes added to cart!"));
+
+        card4.getChildren().addAll(img4, name4, price4,  add4);
+
+        //<><><>><><><><><>><><><><> P5<><><><><><><><><><><><><><><><><><><><><><
+
+        ImageView img5 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/kjacket.jpg")));
+        img5.setFitWidth(120);
+        img5.setPreserveRatio(true);
+
+        Label name5 = new Label("jacket");
+        name1.getStyleClass().add("product-name");
+
+        Label price5 = new Label("$15");
+        price1.getStyleClass().add("product-price");
+
+
+        Button add5 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Casual Shirt added to cart!"));
+
+        card5.getChildren().addAll(img5, name5, price5, add5);
+
+//<><><><><><><><><<><><><><><>P6><><><><><><><><><><><><><><
+
+        ImageView img6 = new ImageView(new Image(getClass().getResourceAsStream("/com/example/fx_final_project/image/shoes.jpg")));
+        img6.setFitWidth(120);
+        img6.setPreserveRatio(true);
+
+        Label name6 = new Label("Shoes");
+        name1.getStyleClass().add("product-name");
+
+        Label price6 = new Label("$13");
+        price1.getStyleClass().add("product-price");
+
+
+
+
+        Button add6 = new Button("Add to Cart");
+        add1.getStyleClass().add("primary-btn");
+        add1.setOnAction(e -> showAlert(Alert.AlertType.INFORMATION, "Added","Shoes added to cart!"));
+
+        card6.getChildren().addAll(img6, name6, price6,  add6);//><><><><><><><><><><><><><><><><><><><<><><><><><><><><><><><><><><><><><><
+        //  Grid
+        grid.add(card1, 0, 1);
+        grid.add(card2, 1, 1);
+        grid.add(card3, 2, 1);
+        grid.add(card4, 0, 2);
+        grid.add(card5, 1, 2);
+        grid.add(card6, 2, 2);
+
+
+
+        // Back Button
+        Button backBtn = new Button("Back");
+        backBtn.getStyleClass().add("back-btn");
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+        grid.add(backBtn, 1, 3);
+
+        ScrollPane scroll = new ScrollPane(grid);
+        scroll.setFitToWidth(true);
+
+        return scroll;
     }
 
-    private double calculateTotal() {
-        double total = 0.0;
-        for (Order order : myCart) {
-            try {
-                String cleanPrice = order.price.replace("$", "").trim();
-                total += Double.parseDouble(cleanPrice);
-            } catch (NumberFormatException e) { /* ignore */ }
-        }
-        return total;
-    }
-
-    private ImageView getLogoView() {
-        ImageView logoView = new ImageView();
-        try {
-            logoView.setImage(new Image(getClass().getResourceAsStream("mickey_store.jpg")));
-            logoView.setFitWidth(150); logoView.setPreserveRatio(true);
-        } catch (Exception e) { /* ignore */ }
-        return logoView;
-    }
-
+    // علشان الصوره لو مجتش او فيها error
     private Image loadImage(String path) {
-        try { return new Image(getClass().getResource(path).toExternalForm()); }
-        catch (Exception e) { return new Image("https://via.placeholder.com/150"); }
-    }
-
-    private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title); alert.setContentText(content);
-        alert.showAndWait();
+        try {
+            return new Image(getClass().getResource(path).toExternalForm());
+        } catch (Exception e) {
+            System.err.println("Image not found: " + path);
+            return new Image("https://via.placeholder.com/150");
+        }
     }
 
     public static void main(String[] args) {
