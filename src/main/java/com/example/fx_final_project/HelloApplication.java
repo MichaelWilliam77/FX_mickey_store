@@ -8,29 +8,29 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
 public class HelloApplication extends Application {
 
-    // Main layout
-    private BorderPane mainLayout;
+    // المستخدم الحالي
+    private String currentUser = null;
 
-    // Virtual Database (The Cart) - مخزن مؤقت للمشتريات
+    // Layout & Data
+    private BorderPane mainLayout;
     private final ArrayList<Order> myCart = new ArrayList<>();
 
-    // Inner Class to represent an Order
+    // Inner Class for Order
     public static class Order {
-        String name;
-        String price;
-        String size;
-
+        String name; String price; String size;
         public Order(String name, String price, String size) {
-            this.name = name;
-            this.price = price;
-            this.size = size;
+            this.name = name; this.price = price; this.size = size;
         }
     }
 
@@ -38,7 +38,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
         mainLayout = new BorderPane();
 
-        // 1. Header (Logo + Slogan)
+        // 1. Header
         ImageView logo = getLogoView();
         Label slogan = new Label("not just clothes, it's a store you could rely on");
         slogan.setStyle("-fx-font-style: italic; -fx-text-fill: #2c3e50; -fx-font-size: 14px; -fx-font-weight: bold;");
@@ -52,8 +52,8 @@ public class HelloApplication extends Application {
         mainLayout.setTop(topContainer);
         mainLayout.setCenter(createLoginPane());
 
-        // 2. Scene Setup
-        Scene scene = new Scene(mainLayout, 900, 700); // كبرنا الشاشة عشان تسع صفحة الدفع
+        // 2. Scene
+        Scene scene = new Scene(mainLayout, 900, 700);
         try {
             scene.getStylesheets().add(getClass().getResource("mickey.css").toExternalForm());
         } catch (Exception e) {
@@ -71,26 +71,39 @@ public class HelloApplication extends Application {
 
     private GridPane createLoginPane() {
         GridPane root = new GridPane();
-        root.setAlignment(Pos.CENTER);
-        root.setHgap(10);
-        root.setVgap(10);
-        root.setPadding(new Insets(20));
+        root.setAlignment(Pos.CENTER); root.setHgap(10); root.setVgap(10); root.setPadding(new Insets(20));
 
-        Label nameLabel = new Label("Name");
-        TextField nameField = new TextField();
-        nameField.setPromptText("Enter your name");
-
-        Label passLabel = new Label("Password: ");
-        PasswordField passField = new PasswordField();
-        passField.setPromptText("Enter your password");
+        Label nameLabel = new Label("Name"); TextField nameField = new TextField(); nameField.setPromptText("Enter your name");
+        Label passLabel = new Label("Password: "); PasswordField passField = new PasswordField(); passField.setPromptText("Enter your password");
 
         Button signInBtn = new Button("Sign In");
         signInBtn.getStyleClass().add("primary-btn");
         signInBtn.setOnAction(e -> {
-            if (nameField.getText().equals("mickey") && passField.getText().equals("123")) {
-                mainLayout.setCenter(createCategoriesPane());
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Wrong username or password");
+            String username = nameField.getText().trim();
+            String password = passField.getText().trim();
+
+            if(username.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Enter username and password"); return;
+            }
+
+            try (Connection con = DBConnection.getConnection()) {
+                String sql = "SELECT name FROM users WHERE name=? AND password=?";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()) {
+                    currentUser = rs.getString("name");
+                    // showAlert(Alert.AlertType.INFORMATION, "Welcome", "Hello " + currentUser + "!");
+                    mainLayout.setCenter(createCategoriesPane());
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Wrong username or password");
+                }
+                rs.close(); ps.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Database error!");
             }
         });
 
@@ -107,34 +120,53 @@ public class HelloApplication extends Application {
 
     private GridPane createSignupPane() {
         GridPane signupRoot = new GridPane();
-        signupRoot.setPadding(new Insets(20));
-        signupRoot.setAlignment(Pos.CENTER);
-        signupRoot.setVgap(10);
-        signupRoot.setHgap(10);
+        signupRoot.setPadding(new Insets(20)); signupRoot.setAlignment(Pos.CENTER);
+        signupRoot.setVgap(10); signupRoot.setHgap(10);
 
         Label nameLabel = new Label("Name:"); TextField nameField = new TextField();
         Label numberLabel = new Label("Phone:"); TextField numberField = new TextField();
         Label passLabel = new Label("Password:"); PasswordField passField = new PasswordField();
         Label repassLabel = new Label("Re-Password:"); PasswordField repassField = new PasswordField();
-        HBox genderBox = new HBox(15, new RadioButton("Male"), new RadioButton("Female"));
+
+        // Fix Gender Issue
+        RadioButton maleRb = new RadioButton("Male");
+        RadioButton femaleRb = new RadioButton("Female");
+        ToggleGroup tg = new ToggleGroup();
+        maleRb.setToggleGroup(tg); femaleRb.setToggleGroup(tg);
+        maleRb.setSelected(true);
+        HBox genderBox = new HBox(15, maleRb, femaleRb);
 
         Button registerBtn = new Button("Register");
         registerBtn.getStyleClass().add("primary-btn");
         registerBtn.setOnAction(e -> {
             if (nameField.getText().isEmpty() || passField.getText().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill all fields");
-                return;
+                showAlert(Alert.AlertType.ERROR, "Error", "Please fill all fields"); return;
             }
-            if (passField.getText().equals(repassField.getText())) {
+            if (!passField.getText().equals(repassField.getText())) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Passwords do not match!"); return;
+            }
+            try (Connection con = DBConnection.getConnection()) {
+                String sql = "INSERT INTO users(name, phone, password, gender) VALUES(?, ?, ?, ?)";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, nameField.getText().trim());
+                ps.setString(2, numberField.getText().trim());
+                ps.setString(3, passField.getText().trim());
+
+                // Correct Gender Logic
+                String selectedGender = maleRb.isSelected() ? "Male" : "Female";
+                ps.setString(4, selectedGender);
+
+                ps.executeUpdate();
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Account created!");
                 mainLayout.setCenter(createLoginPane());
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Passwords do not match!");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Database error or Username exists!");
             }
         });
 
         Button backBtn = new Button("Back to Login");
-        backBtn.getStyleClass().add("primary-btn");
+        backBtn.getStyleClass().addAll("primary-btn", "btn-secondary");
         backBtn.setOnAction(e -> mainLayout.setCenter(createLoginPane()));
 
         signupRoot.add(nameLabel, 0, 0); signupRoot.add(nameField, 1, 0);
@@ -142,7 +174,6 @@ public class HelloApplication extends Application {
         signupRoot.add(passLabel, 0, 2); signupRoot.add(passField, 1, 2);
         signupRoot.add(repassLabel, 0, 3); signupRoot.add(repassField, 1, 3);
         signupRoot.add(genderBox, 1, 4);
-
         HBox btns = new HBox(10, registerBtn, backBtn);
         btns.setAlignment(Pos.CENTER_RIGHT);
         signupRoot.add(btns, 1, 5);
@@ -151,62 +182,59 @@ public class HelloApplication extends Application {
     }
 
     // ============================================
-    // 2. CATEGORIES (HOME) & CART
+    // 2. CATEGORIES (HOME)
     // ============================================
 
     private GridPane createCategoriesPane() {
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(20);
-        grid.setVgap(20);
-        grid.setPadding(new Insets(20));
+        grid.setAlignment(Pos.CENTER); grid.setHgap(20); grid.setVgap(20); grid.setPadding(new Insets(20));
 
         Label welcomeLabel = new Label("Choose a Category:");
         welcomeLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Button gentsBtn = new Button("Gents");
-        gentsBtn.setPrefSize(120, 50);
+        Button gentsBtn = new Button("Gents"); gentsBtn.setPrefSize(120, 50);
         gentsBtn.setOnAction(e -> mainLayout.setCenter(GentsSection()));
 
-        Button ladiesBtn = new Button("Ladies");
-        ladiesBtn.setPrefSize(120, 50);
+        Button ladiesBtn = new Button("Ladies"); ladiesBtn.setPrefSize(120, 50);
         ladiesBtn.setOnAction(e -> mainLayout.setCenter(LadiesSection()));
 
-        Button kidsBtn = new Button("Kids");
-        kidsBtn.setPrefSize(120, 50);
+        Button kidsBtn = new Button("Kids"); kidsBtn.setPrefSize(120, 50);
         kidsBtn.setOnAction(e -> mainLayout.setCenter(KidsSection()));
 
-        // --- تعديل حجم الزرار هنا لـ 200 عشان الكلام يظهر ---
+        Button profileBtn = new Button("Profile"); profileBtn.setPrefSize(120, 50);
+        profileBtn.getStyleClass().add("primary-btn");
+        profileBtn.setOnAction(e -> mainLayout.setCenter(ProfileSection()));
+
         Button cartBtn = new Button("My Cart (" + myCart.size() + ")");
         cartBtn.setPrefSize(200, 50);
-        cartBtn.setStyle("-fx-background-color: #ff9f43; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;");
+        cartBtn.getStyleClass().add("btn-warning");
         cartBtn.setOnAction(e -> mainLayout.setCenter(createCartScreen()));
 
         Button logoutBtn = new Button("Logout");
-        logoutBtn.setStyle("-fx-background-color: #702963; -fx-text-fill: white;");
+        logoutBtn.getStyleClass().add("btn-purple");
         logoutBtn.setOnAction(e -> {
             myCart.clear();
+            currentUser = null;
             mainLayout.setCenter(createLoginPane());
         });
 
-        grid.add(welcomeLabel, 0, 0, 3, 1);
-        grid.add(gentsBtn, 0, 1);
-        grid.add(ladiesBtn, 1, 1);
-        grid.add(kidsBtn, 2, 1);
-        grid.add(cartBtn, 0, 2, 3, 1);
-        grid.add(logoutBtn, 0, 4, 3, 1);
+        grid.add(welcomeLabel, 0, 0, 4, 1);
+        grid.add(gentsBtn, 0, 1); grid.add(ladiesBtn, 1, 1); grid.add(kidsBtn, 2, 1); grid.add(profileBtn, 3, 1);
+        grid.add(cartBtn, 0, 2, 4, 1);
+        grid.add(logoutBtn, 0, 3, 4, 1);
 
         return grid;
     }
 
+    // ============================================
+    // 3. CART
+    // ============================================
+
     private ScrollPane createCartScreen() {
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setVgap(15);
-        grid.setPadding(new Insets(20));
+        grid.setAlignment(Pos.CENTER); grid.setVgap(15); grid.setPadding(new Insets(20));
 
-        Label title = new Label("My Shopping Cart");
-        title.getStyleClass().add("section-title");
+        Label title = new Label("My Shopping Cart"); title.getStyleClass().add("section-title");
         grid.add(title, 0, 0);
 
         if (myCart.isEmpty()) {
@@ -215,7 +243,7 @@ public class HelloApplication extends Application {
             grid.add(emptyLbl, 0, 1);
 
             Button backBtn = new Button("Back to Categories");
-            backBtn.getStyleClass().add("primary-btn");
+            backBtn.getStyleClass().addAll("primary-btn", "btn-secondary");
             backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
             grid.add(backBtn, 0, 2);
         } else {
@@ -223,15 +251,15 @@ public class HelloApplication extends Application {
             for (Order order : myCart) {
                 HBox itemRow = new HBox(20);
                 itemRow.setAlignment(Pos.CENTER_LEFT);
-                itemRow.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 10; -fx-border-color: #ddd; -fx-border-radius: 10;");
-                itemRow.setPrefWidth(550); // وسعنا الصف شوية
+                itemRow.getStyleClass().add("white-box");
+                itemRow.setPrefWidth(550);
 
                 Label nameLbl = new Label(order.name); nameLbl.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;"); nameLbl.setPrefWidth(120);
                 Label sizeLbl = new Label("Size: " + order.size); sizeLbl.setPrefWidth(100);
                 Label priceLbl = new Label(order.price); priceLbl.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
 
                 Button deleteBtn = new Button("Remove");
-                deleteBtn.setStyle("-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-size: 10px;");
+                deleteBtn.getStyleClass().addAll("btn-danger", "btn-sm");
                 deleteBtn.setOnAction(e -> {
                     myCart.remove(order);
                     mainLayout.setCenter(createCartScreen());
@@ -242,145 +270,216 @@ public class HelloApplication extends Application {
                 grid.add(itemRow, 0, row++);
             }
 
-            // Buttons: Back & Proceed to Checkout
             Button backBtn = new Button("Back Shopping");
-            backBtn.getStyleClass().add("primary-btn");
-            backBtn.setStyle("-fx-background-color: #95a5a6;");
+            backBtn.getStyleClass().addAll("primary-btn", "btn-secondary");
             backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
 
             Button checkoutBtn = new Button("Proceed to Checkout ➔");
-            checkoutBtn.getStyleClass().add("primary-btn");
-            checkoutBtn.setStyle("-fx-background-color: #27ae60; -fx-font-size: 14px;");
+            checkoutBtn.getStyleClass().add("btn-success");
             checkoutBtn.setOnAction(e -> mainLayout.setCenter(createPaymentScreen()));
 
-            HBox actions = new HBox(15, backBtn, checkoutBtn);
-            actions.setAlignment(Pos.CENTER);
+            HBox actions = new HBox(15, backBtn, checkoutBtn); actions.setAlignment(Pos.CENTER);
             grid.add(actions, 0, row + 1);
         }
-
-        ScrollPane scroll = new ScrollPane(grid);
-        scroll.setFitToWidth(true);
+        ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true);
         return scroll;
     }
 
     // ============================================
-    // 3. CHECKOUT / PAYMENT SCREEN (NEW)
+    // 4. CHECKOUT SCREEN
     // ============================================
 
     private ScrollPane createPaymentScreen() {
         VBox layout = new VBox(20);
-        layout.setAlignment(Pos.TOP_CENTER);
-        layout.setPadding(new Insets(30));
-        layout.setStyle("-fx-background-color: #f4f4f4;");
+        layout.setAlignment(Pos.TOP_CENTER); layout.setPadding(new Insets(30));
 
-        // Title & Total
-        Label title = new Label("Checkout");
-        title.getStyleClass().add("section-title");
-
+        Label title = new Label("Checkout"); title.getStyleClass().add("section-title");
         double totalAmount = calculateTotal();
         Label totalLbl = new Label("Total to Pay: $" + totalAmount);
-        totalLbl.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #27ae60;");
+        totalLbl.getStyleClass().add("total-price-text");
 
-        // Shipping Address
         VBox shippingBox = new VBox(10);
-        shippingBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
-
-        Label shipTitle = new Label("📍 Shipping Address");
-        shipTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        shippingBox.getStyleClass().add("white-box");
+        Label shipTitle = new Label("📍 Shipping Address"); shipTitle.getStyleClass().add("field-label");
         TextField addressField = new TextField(); addressField.setPromptText("Enter your full address");
         TextField phoneField = new TextField(); phoneField.setPromptText("Contact Phone Number");
         shippingBox.getChildren().addAll(shipTitle, addressField, phoneField);
 
-        // Payment Method
         VBox paymentBox = new VBox(10);
-        paymentBox.setStyle("-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);");
+        paymentBox.getStyleClass().add("white-box");
+        Label payTitle = new Label("💳 Payment Method"); payTitle.getStyleClass().add("field-label");
+        RadioButton cardRb = new RadioButton("Credit Card"); RadioButton cashRb = new RadioButton("Cash on Delivery");
+        ToggleGroup group = new ToggleGroup(); cardRb.setToggleGroup(group); cashRb.setToggleGroup(group); cardRb.setSelected(true);
 
-        Label payTitle = new Label("💳 Payment Method");
-        payTitle.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
-
-        RadioButton cardRb = new RadioButton("Credit Card");
-        RadioButton cashRb = new RadioButton("Cash on Delivery");
-        ToggleGroup group = new ToggleGroup();
-        cardRb.setToggleGroup(group); cashRb.setToggleGroup(group);
-        cardRb.setSelected(true);
-
-        GridPane cardGrid = new GridPane();
-        cardGrid.setHgap(10); cardGrid.setVgap(10);
+        GridPane cardGrid = new GridPane(); cardGrid.setHgap(10); cardGrid.setVgap(10);
         TextField cardNum = new TextField(); cardNum.setPromptText("0000 0000 0000 0000");
         TextField cardName = new TextField(); cardName.setPromptText("Cardholder Name");
         TextField cardExp = new TextField(); cardExp.setPromptText("MM/YY"); cardExp.setPrefWidth(80);
         TextField cardCvv = new TextField(); cardCvv.setPromptText("CVV"); cardCvv.setPrefWidth(80);
-
         cardGrid.add(new Label("Card Number:"), 0, 0); cardGrid.add(cardNum, 1, 0);
         cardGrid.add(new Label("Holder Name:"), 0, 1); cardGrid.add(cardName, 1, 1);
-        HBox secInfo = new HBox(10, cardExp, cardCvv);
-        cardGrid.add(new Label("Exp/CVV:"), 0, 2); cardGrid.add(secInfo, 1, 2);
+        HBox secInfo = new HBox(10, cardExp, cardCvv); cardGrid.add(new Label("Exp/CVV:"), 0, 2); cardGrid.add(secInfo, 1, 2);
 
         cashRb.setOnAction(e -> cardGrid.setDisable(true));
         cardRb.setOnAction(e -> cardGrid.setDisable(false));
-
         paymentBox.getChildren().addAll(payTitle, cardRb, cashRb, new Separator(), cardGrid);
 
-        // Actions
-// ... (باقي الكود زي ما هو لحد تعريف الزرار)
-
         Button payBtn = new Button("Confirm Payment ($" + totalAmount + ")");
-        payBtn.getStyleClass().add("primary-btn");
-        payBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;");
+        payBtn.getStyleClass().add("btn-success");
         payBtn.setPrefWidth(250);
 
         payBtn.setOnAction(e -> {
-            // 1. التحقق من العنوان والتليفون (للكل)
             if(addressField.getText().trim().isEmpty() || phoneField.getText().trim().isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Missing Info", "Please enter your shipping address and phone.");
-                return; // وقف الكود هنا
+                showAlert(Alert.AlertType.ERROR, "Missing Info", "Please enter your shipping address and phone."); return;
             }
-
-            // 2. التحقق من بيانات الفيزا (فقط لو مختار Credit Card)
             if (cardRb.isSelected()) {
-                // التأكد إن رقم الكارت 16 رقم بالظبط (Regex)
-                if (!cardNum.getText().matches("\\d{16}")) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid Card", "Card number must be 16 digits (Numbers only).");
-                    return;
-                }
-
-                // التأكد إن الـ CVV مكون من 3 أرقام
-                if (!cardCvv.getText().matches("\\d{3}")) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid CVV", "CVV must be 3 digits.");
-                    return;
-                }
-
-                // التأكد إن التاريخ مش فاضي
-                if (cardExp.getText().isEmpty()) {
-                    showAlert(Alert.AlertType.ERROR, "Invalid Date", "Please enter expiry date.");
-                    return;
-                }
+                if (!cardNum.getText().matches("\\d{16}")) { showAlert(Alert.AlertType.ERROR, "Invalid Card", "Card number must be 16 digits."); return; }
+                if (!cardCvv.getText().matches("\\d{3}")) { showAlert(Alert.AlertType.ERROR, "Invalid CVV", "CVV must be 3 digits."); return; }
+                if (cardExp.getText().isEmpty()) { showAlert(Alert.AlertType.ERROR, "Invalid Date", "Please enter expiry date."); return; }
             }
-
-            // 3. لو عدى من كل الشروط اللي فوق، تم الدفع بنجاح
-            showAlert(Alert.AlertType.INFORMATION, "Payment Successful",
-                    "Order Placed Successfully!\nShipping to: " + addressField.getText());
-
-            myCart.clear(); // فضي السلة
-            mainLayout.setCenter(createCategoriesPane()); // ارجع للصفحة الرئيسية
+            showAlert(Alert.AlertType.INFORMATION, "Payment Successful", "Order Placed Successfully!\nShipping to: " + addressField.getText());
+            myCart.clear();
+            mainLayout.setCenter(createCategoriesPane());
         });
 
         Button cancelBtn = new Button("Cancel");
-        cancelBtn.getStyleClass().add("primary-btn");
-        cancelBtn.setStyle("-fx-background-color: #e74c3c;");
+        cancelBtn.getStyleClass().add("btn-danger");
         cancelBtn.setOnAction(e -> mainLayout.setCenter(createCartScreen()));
 
-        HBox actions = new HBox(20, payBtn, cancelBtn);
-        actions.setAlignment(Pos.CENTER);
-
+        HBox actions = new HBox(20, payBtn, cancelBtn); actions.setAlignment(Pos.CENTER);
         layout.getChildren().addAll(title, totalLbl, shippingBox, paymentBox, actions);
-        ScrollPane scroll = new ScrollPane(layout);
-        scroll.setFitToWidth(true);
+        ScrollPane scroll = new ScrollPane(layout); scroll.setFitToWidth(true);
         return scroll;
     }
 
     // ============================================
-    // 4. PRODUCT SECTIONS & HELPERS
+    // 5. PROFILE SECTION (FIXED & REFACTORED)
+    // ============================================
+
+    private ScrollPane ProfileSection() {
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.TOP_CENTER); layout.setPadding(new Insets(30));
+
+        Label title = new Label("My Profile"); title.getStyleClass().add("section-title");
+
+        ImageView profileImg = new ImageView(loadImage("https://cdn-icons-png.flaticon.com/512/3135/3135715.png"));
+        profileImg.setFitWidth(100); profileImg.setPreserveRatio(true);
+        profileImg.getStyleClass().add("profile-image-view");
+        Circle clip = new Circle(50, 50, 50); profileImg.setClip(clip);
+
+        VBox formBox = new VBox(15);
+        formBox.getStyleClass().add("profile-form-box");
+        formBox.setMaxWidth(400);
+
+        Label nameLbl = new Label("Username:"); nameLbl.getStyleClass().add("field-label");
+        TextField nameField = new TextField(currentUser);
+        nameField.setEditable(false);
+        nameField.getStyleClass().add("profile-field");
+
+        Label passLbl = new Label("Enter New Password:"); passLbl.getStyleClass().add("field-label");
+
+        // Fix: Empty TextField (no space)
+        TextField newPassField = new TextField();
+        newPassField.setPromptText("Enter new password");
+        newPassField.setEditable(false);
+        newPassField.getStyleClass().add("profile-field");
+
+        formBox.getChildren().addAll(nameLbl, nameField, passLbl, newPassField);
+
+        Button editBtn = new Button("Edit Profile");
+        editBtn.getStyleClass().add("primary-btn");
+        editBtn.setPrefWidth(200);
+
+        editBtn.setOnAction(e -> {
+            boolean isEditable = nameField.isEditable();
+            if (!isEditable) {
+                // Enable Edit
+                nameField.setEditable(true);
+                newPassField.setEditable(true);
+                nameField.getStyleClass().add("profile-field-editable");
+                newPassField.getStyleClass().add("profile-field-editable");
+                editBtn.setText("Save Changes");
+                editBtn.getStyleClass().remove("primary-btn");
+                editBtn.getStyleClass().add("btn-success");
+            } else {
+                // Save Logic
+                String newPass = newPassField.getText().trim();
+
+                if(newPass.isEmpty()) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Password cannot be empty"); return;
+                }
+
+                try (Connection con = DBConnection.getConnection()) {
+                    String sql = "UPDATE users SET password = ? WHERE name = ?";
+                    PreparedStatement ps = con.prepareStatement(sql);
+                    ps.setString(1, newPass);
+                    ps.setString(2, currentUser);
+                    int updatedRows = ps.executeUpdate();
+                    ps.close();
+
+                    if (updatedRows > 0) {
+                        showAlert(Alert.AlertType.INFORMATION, "Saved", "Profile updated successfully!");
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Error", "Failed to update profile.");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Error", "Database error occurred!");
+                }
+
+                // Disable Edit
+                nameField.setEditable(false);
+                newPassField.setEditable(false);
+                nameField.getStyleClass().remove("profile-field-editable");
+                newPassField.getStyleClass().remove("profile-field-editable");
+                editBtn.setText("Edit Profile");
+                editBtn.getStyleClass().remove("btn-success");
+                editBtn.getStyleClass().add("primary-btn");
+            }
+        });
+
+        Button deleteBtn = new Button("Delete Account");
+        deleteBtn.getStyleClass().add("btn-danger");
+        deleteBtn.setPrefWidth(200);
+        deleteBtn.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete Account");
+            alert.setHeaderText("Are you sure?");
+            if (alert.showAndWait().get() == ButtonType.OK) {
+                try (Connection con = DBConnection.getConnection()) {
+                    String sql = "DELETE FROM users WHERE name = ?";
+                    PreparedStatement ps = con.prepareStatement(sql);
+                    ps.setString(1, currentUser);
+                    int deletedRows = ps.executeUpdate();
+
+                    if (deletedRows > 0) {
+                        showAlert(Alert.AlertType.INFORMATION, "Deleted", "Account deleted successfully!");
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete account.");
+                    }
+                    ps.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Error", "Database error occurred!");
+                }
+                myCart.clear();
+                currentUser = null;
+                mainLayout.setCenter(createLoginPane());
+            }
+        });
+
+        Button backBtn = new Button("Back");
+        backBtn.getStyleClass().addAll("primary-btn", "btn-secondary");
+        backBtn.setPrefWidth(200);
+        backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
+
+        layout.getChildren().addAll(title, profileImg, formBox, editBtn, deleteBtn, backBtn);
+        ScrollPane scroll = new ScrollPane(layout); scroll.setFitToWidth(true);
+        return scroll;
+    }
+
+    // ============================================
+    // 6. SECTIONS & HELPERS
     // ============================================
 
     private ScrollPane GentsSection() {
@@ -418,56 +517,31 @@ public class HelloApplication extends Application {
 
     private ScrollPane createSectionGrid(String titleStr, String[][] productsData) {
         GridPane grid = new GridPane();
-        grid.setPadding(new Insets(20));
-        grid.setHgap(30);
-        grid.setVgap(45);
-        grid.setAlignment(Pos.CENTER);
-
-        Label title = new Label(titleStr);
-        title.getStyleClass().add("section-title");
+        grid.setPadding(new Insets(20)); grid.setHgap(30); grid.setVgap(45); grid.setAlignment(Pos.CENTER);
+        Label title = new Label(titleStr); title.getStyleClass().add("section-title");
         grid.add(title, 0, 0, 3, 1);
-
-        int col = 0;
-        int row = 1;
+        int col = 0; int row = 1;
         for (String[] prod : productsData) {
             grid.add(createCard(prod[0], prod[1], prod[2]), col, row);
-            col++;
-            if (col == 3) {
-                col = 0;
-                row++;
-            }
+            col++; if (col == 3) { col = 0; row++; }
         }
-
         Button backBtn = new Button("Back");
-        backBtn.getStyleClass().add("primary-btn");
-        backBtn.setStyle("-fx-background-color: #6c757d;");
+        backBtn.getStyleClass().addAll("primary-btn", "btn-secondary");
         backBtn.setOnAction(e -> mainLayout.setCenter(createCategoriesPane()));
         grid.add(backBtn, 1, row + 1);
-
-        ScrollPane scroll = new ScrollPane(grid);
-        scroll.setFitToWidth(true);
+        ScrollPane scroll = new ScrollPane(grid); scroll.setFitToWidth(true);
         return scroll;
     }
 
     private VBox createCard(String name, String price, String imagePath) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        card.getStyleClass().add("product-card");
-
+        VBox card = new VBox(10); card.setAlignment(Pos.CENTER); card.getStyleClass().add("product-card");
         ImageView imageView = new ImageView(loadImage(imagePath));
-        imageView.setFitWidth(120);
-        imageView.setPreserveRatio(true);
-
-        Label productName = new Label(name);
-        productName.getStyleClass().add("product-name");
-
-        Label productPrice = new Label(price);
-        productPrice.getStyleClass().add("product-price");
-
+        imageView.setFitWidth(120); imageView.setPreserveRatio(true);
+        Label productName = new Label(name); productName.getStyleClass().add("product-name");
+        Label productPrice = new Label(price); productPrice.getStyleClass().add("product-price");
         Button btn = new Button("Buy");
         btn.getStyleClass().add("primary-btn");
         btn.setOnAction(e -> showProductDetails(name, price, imagePath));
-
         card.getChildren().addAll(imageView, productName, productPrice, btn);
         return card;
     }
@@ -476,15 +550,12 @@ public class HelloApplication extends Application {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
         popupStage.setTitle("Product Details");
+        popupStage.setMinWidth(300);
 
         VBox layout = new VBox(15);
-        layout.setAlignment(Pos.CENTER);
-        layout.setPadding(new Insets(20));
-        layout.setStyle("-fx-background-color: white;");
-
+        layout.setAlignment(Pos.CENTER); layout.setPadding(new Insets(20)); layout.setStyle("-fx-background-color: white;");
         ImageView img = new ImageView(loadImage(imagePath));
         img.setFitWidth(150); img.setPreserveRatio(true);
-
         Label nameLbl = new Label(name); nameLbl.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         Label priceLbl = new Label(price); priceLbl.setStyle("-fx-font-size: 18px; -fx-text-fill: green;");
         Label sizeLbl = new Label("Select Size:");
@@ -493,7 +564,7 @@ public class HelloApplication extends Application {
         sizeBox.setValue("Medium");
 
         Button confirmBtn = new Button("Confirm & Add to Cart");
-        confirmBtn.getStyleClass().add("primary-btn");
+        confirmBtn.getStyleClass().add("btn-success");
         confirmBtn.setOnAction(e -> {
             myCart.add(new Order(name, price, sizeBox.getValue()));
             showAlert(Alert.AlertType.INFORMATION, "Success", "Added to Cart!");
@@ -502,9 +573,7 @@ public class HelloApplication extends Application {
 
         layout.getChildren().addAll(img, nameLbl, priceLbl, sizeLbl, sizeBox, confirmBtn);
         Scene scene = new Scene(layout);
-        popupStage.setMinWidth(300);
-        try { scene.getStylesheets().add(getClass().getResource("mickey.css").toExternalForm()); }
-        catch (Exception ex) { /* ignore */ }
+        try { scene.getStylesheets().add(getClass().getResource("mickey.css").toExternalForm()); } catch (Exception ex) {}
         popupStage.setScene(scene);
         popupStage.showAndWait();
     }
@@ -512,26 +581,19 @@ public class HelloApplication extends Application {
     private double calculateTotal() {
         double total = 0.0;
         for (Order order : myCart) {
-            try {
-                String cleanPrice = order.price.replace("$", "").trim();
-                total += Double.parseDouble(cleanPrice);
-            } catch (NumberFormatException e) { /* ignore */ }
+            try { total += Double.parseDouble(order.price.replace("$", "").trim()); } catch (Exception e) {}
         }
         return total;
     }
 
     private ImageView getLogoView() {
         ImageView logoView = new ImageView();
-        try {
-            logoView.setImage(new Image(getClass().getResourceAsStream("mickey_store.jpg")));
-            logoView.setFitWidth(150); logoView.setPreserveRatio(true);
-        } catch (Exception e) { /* ignore */ }
+        try { logoView.setImage(new Image(getClass().getResourceAsStream("mickey_store.jpg"))); logoView.setFitWidth(150); logoView.setPreserveRatio(true); } catch (Exception e) {}
         return logoView;
     }
 
     private Image loadImage(String path) {
-        try { return new Image(getClass().getResource(path).toExternalForm()); }
-        catch (Exception e) { return new Image("https://via.placeholder.com/150"); }
+        try { return new Image(getClass().getResource(path).toExternalForm()); } catch (Exception e) { return new Image("https://via.placeholder.com/150"); }
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

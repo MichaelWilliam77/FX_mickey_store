@@ -76,3 +76,157 @@
 .back-btn:hover {
     -fx-background-color: #545b62;
 }
+/* =========================================================
+   ملف الستايل الكامل - Mickey Store
+   ========================================================= */
+
+/* 1. إعدادات عامة */
+.root {
+    -fx-font-family: 'Arial', sans-serif;
+    -fx-background-color: #f4f4f4;
+}
+
+/* 2. الهيدر */
+.header {
+    -fx-background-color: #A7D5FF;
+    -fx-alignment: center;
+    -fx-spacing: 5;
+    -fx-padding: 15;
+}
+
+.slogan {
+    -fx-font-style: italic;
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* 3. العناوين */
+.section-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-padding: 0 0 20 0;
+}
+
+.welcome-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.total-price-text {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #27ae60;
+}
+
+/* =========================================================
+   4. الأزرار (هنا السر في الألوان)
+   استخدمنا !important عشان نجبر اللون يظهر
+   ========================================================= */
+
+/* الشكل الموحد لكل الزراير */
+.button {
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* الأزرق (الأساسي - Sign In, Register, Categories) */
+.primary-btn {
+    -fx-background-color: #007bff !important;
+}
+.primary-btn:hover { -fx-background-color: #0056b3 !important; }
+
+/* الأخضر (Confirm Payment, Save Changes) */
+.btn-success {
+    -fx-background-color: #27ae60 !important;
+}
+.btn-success:hover { -fx-background-color: #219150 !important; }
+
+/* الأحمر (Remove, Delete Account, Cancel) */
+.btn-danger {
+    -fx-background-color: #e74c3c !important;
+}
+.btn-danger:hover { -fx-background-color: #c0392b !important; }
+
+/* البرتقالي (My Cart) */
+.btn-warning {
+    -fx-background-color: #ff9f43 !important;
+}
+.btn-warning:hover { -fx-background-color: #e67e22 !important; }
+
+/* الرمادي (Back) */
+.btn-secondary {
+    -fx-background-color: #6c757d !important;
+}
+.btn-secondary:hover { -fx-background-color: #545b62 !important; }
+
+/* البنفسجي (Logout) */
+.btn-purple {
+    -fx-background-color: #702963 !important;
+}
+.btn-purple:hover { -fx-background-color: #5a1e4f !important; }
+
+/* زرار صغير */
+.btn-sm {
+    -fx-font-size: 10px;
+    -fx-padding: 5 10;
+}
+
+/* =========================================================
+   5. كروت المنتجات
+   ========================================================= */
+.product-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-alignment: center;
+    -fx-spacing: 10;
+    -fx-padding: 15;
+    -fx-pref-width: 160px;
+    -fx-min-height: 220px;
+}
+.product-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+.product-name { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333; }
+.product-price { -fx-font-size: 14px; -fx-text-fill: #e67e22; }
+
+/* =========================================================
+   6. البروفايل والصناديق البيضاء
+   ========================================================= */
+.white-box, .profile-form-box {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.profile-field {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 5;
+    -fx-padding: 8;
+}
+
+.profile-field-editable {
+    -fx-background-color: white;
+    -fx-border-color: #3498db;
+    -fx-border-width: 2px;
+}
+
+.field-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #555;
+    -fx-font-size: 14px;
+}
+
+.profile-image-view {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
