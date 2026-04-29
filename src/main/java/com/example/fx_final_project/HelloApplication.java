@@ -81,17 +81,32 @@ public class HelloApplication extends Application {
         Button signInBtn = new Button("Sign In");
         signInBtn.getStyleClass().add("primary-btn");
         signInBtn.setOnAction(e -> {
-            // تعديل مؤقت للتجربة بدون داتابيز
             String username = nameField.getText().trim();
             String password = passField.getText().trim();
 
-            if (!username.isEmpty() && !password.isEmpty()) {
-                // بنعتبر أي مستخدم يدخل بياناته إنه سجل دخول بنجاح
-                currentUser = new User(username);
-                mainLayout.setCenter(createCategoriesPane());
-                showAlert(Alert.AlertType.INFORMATION, "Demo Mode", "Logged in as: " + username);
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Please enter any name and password");
+            if(username.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Enter username and password"); return;
+            }
+
+            try (Connection con = DBConnection.getConnection()) {
+                String sql = "SELECT name FROM users WHERE name=? AND password=?";
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, username);
+                ps.setString(2, password);
+
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()) {
+                    // التعديل 4: تخزين المستخدم كـ Object
+                    currentUser = new User(rs.getString("name"));
+                    showAlert(Alert.AlertType.INFORMATION, "Welcome", "Hello " + currentUser.getUsername() + "!");
+                    mainLayout.setCenter(createCategoriesPane());
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Wrong username or password");
+                }
+                rs.close(); ps.close();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Database error!");
             }
         });
 
